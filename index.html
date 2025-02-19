@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/assets/styles/styles.css">
 </head>
 <body>
-    <section class="board shadow">
+    <section class="board">
         <div class="board__side">
 
             <div class="board__header">
@@ -85,6 +85,10 @@
                     <button class="btn btn__add">
                         <i class="fas fa-plus"></i>
                         Tarea
+                    </button>
+
+                    <button class="btn btn__list btn__list--mobile">
+                        <i class="fas fa-bars"></i>
                     </button>
                 </div>
             </div>
@@ -198,7 +202,7 @@
             <div class="modal__body">
                 <form id="modalForm">
                     <input type="text" class="form-input" placeholder="Nombre" required>
-                    <input type="date" class="form-input" placeholder="Correo" required>
+                    <input type="date" class="form-input" placeholder="Fecha" required>
                     <textarea class="form-input" placeholder="Mensaje (Opcional)" rows="4"></textarea>
                 </form>
             </div>

@@ -32,14 +32,7 @@ body{
     justify-content: center;
     overflow: hidden; /* Evita el scroll */
     background-color: var(--background-color);
-    font-size: 2vh;
-}
-
-.header {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    font-size: 2.2vh;
 }
 
 h1 {
@@ -51,13 +44,11 @@ h2{
 }
 
 .board {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     border-radius: 1rem;
-    width: 50%;
-    height: 80vh;
-    box-shadow:  0 0.5rem 1rem rgba(0, 0, 0, 0.15);;
+    overflow: hidden;
+    width: 90%;
+    height: 90vh;
+    box-shadow:  0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
 
 .board__side,
@@ -66,24 +57,19 @@ h2{
     flex-direction: column;
     justify-content: space-between;
     gap: 2vh;
+    height: 100%;
 }
 
 .board__side{
-    width: 30%;
-    height: 100%;
-    padding: 1.5rem;
+    display: none;
     background-color: var(--primary-color);
-    border-top-left-radius: 1rem;
-    border-bottom-left-radius: 1rem;
+    padding: 2vh;
 }
 
 .board__main{
-    width: 80%;
     height: 100%;
     padding: 1.5rem;
     background: var(--secondary-color);
-    border-top-right-radius: 1rem;
-    border-bottom-right-radius: 1rem;
 }
 
 .board__header{
@@ -96,25 +82,31 @@ h2{
     display: flex;
     align-items: center;
     gap: 0.7rem;
-    /* font-size: 1.1rem; */
+    flex: 1;
 }
 
 .board__logo svg{
-    width: 1.8vw;
+    width: 7vw;
     fill: var(--accent-color);
+}
+
+.board__add{
+    display: flex;
+    justify-content: space-between;
+    gap: 1vh;
 }
 
 .board__date{
     text-align: center;
-    padding: 2rem;
+    padding: 2vh;
 }
 
 .board__date h3 {
-    font-size: 1.5vw;
+    font-size: 3vh;
 }
 
 .board__date h4 {
-    font-size: 1.3vw;
+    font-size: 2.2vh;
 }
 
 .board__table{
@@ -122,7 +114,6 @@ h2{
     flex-direction: column;
     flex: 1;
 }
-
 
 .board__filter{
     display: flex;
@@ -135,8 +126,14 @@ h2{
     border: none;
     background-color: var(--auxiliary-color);
     color: var(--text-color);
-    padding: 0.4rem;
+    padding: 1.5vh;
     font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.board__filter-button:active{
+    color: var(--primary-color);
+    background-color: var(--accent-color);
 }
 
 .board__filter-button--selected{
@@ -146,6 +143,10 @@ h2{
 
 .board__content{
     flex: 1;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    margin: 2vh 0;
 }
 
 .board__list,
@@ -153,11 +154,11 @@ h2{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.5rem 1rem;
+    padding: 1.5vh 2.5vh;
     border-radius: 0.25rem;
-    margin: 1.5rem 0;
-    transition: background 0.3s ease;
-    gap: 1.5vw;
+    margin: 0;
+    transition: all 0.3s ease;
+    gap: 3vh;
 }
 
 .board__list:hover{
@@ -181,7 +182,7 @@ h2{
 .board__pagination{
     display: flex;
     justify-content: center;
-    gap: 1rem;
+    gap: 1.5vh;
 }
 
 .board__add{
@@ -193,7 +194,7 @@ h2{
 }
 
 .btn{
-    padding: 0.35vw 0.7vw;
+    padding: 1vh 2vh;
     /* font-size: 1rem; */
     color: var(--text-color);
     border: none;
@@ -220,11 +221,11 @@ h2{
 .btn__list--edit{
     border: none;
     /* font-size: 1.5rem; */
-    font-size: 1.25vw;
+    font-size: 2.5vh;
     color: var(--text-color);
     font-weight: bold;
     background-color: transparent;
-    padding: 0.2rem 0.5rem;
+    
 }
 
 .btn__list--edit:hover{
@@ -291,7 +292,6 @@ h2{
 }
 
 .modal__header {
-    /* font-size: 1.3rem; */
     color: var(--accent-color);
 }
 
@@ -299,12 +299,12 @@ h2{
     background-color: transparent;
     color: var(--text-color);
     border: none;
-    font-size: 1.5vw;
+    font-size: 3vh;
     cursor: pointer;
     position: absolute;
     top: 0;
     right: 0;
-    padding: 0.7vw;
+    padding: 1.5vh;
 }
 
 .modal__body {
@@ -312,10 +312,6 @@ h2{
     flex-direction: column;
     justify-content: space-between;
 }
-
-/* .modal__body h4{
-    font-size: 1.2rem;
-} */
 
 .modal__option{
     display: flex;
@@ -335,16 +331,117 @@ h2{
 
 .form-input {
     width: 100%;
-    padding: 10px;
-    margin: 10px 0;
+    padding: 1.5vh;
+    margin: 1.5vh 0;
     background-color: var(--auxiliary-color);
-    border: 1px solid var(--secondary-color);
+    border: 0.25vh solid var(--secondary-color);
     border-radius: 5px;
     color: var(--text-color);
-    font-size: 1vw;
+    font-size: 2vh;
 }
 
 .form-input:focus {
     outline: none;
     border-color: var(--accent-color);
+}
+
+@media(min-width:768px){
+    body{
+        font-size: 1.8vh;
+    }
+
+    .board{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 80vh;
+    }
+
+    .board__side{
+        display: flex;
+        width: 30%;
+    }
+
+    .board__main{
+        width: 70%;
+    }
+
+    .board__logo{
+        font-size: 1.8vh;
+    }
+
+    .board__logo svg{
+        width: 3vw;
+    }
+
+    .board__filter-button{
+        font-size: 1.7vh;
+        padding: 1vh;
+    }
+
+    /* .board__task{
+        padding: 1vh 2vh;
+        margin: 1.5vh 0;
+    } */
+
+    .btn{
+        padding: 0.4vw 0.8vw;
+    }
+
+    .btn__list--mobile{
+        display: none;
+    }
+
+    .btn__list--edit{
+        font-size: 1.2vw;
+        padding: 0.2vh 0.5vh;
+    }
+}
+
+@media(min-width: 1025px){
+    .board{
+        width: 50%;
+    }
+
+    .board__main{
+        width: 80%; 
+    }
+
+    .board__logo{
+        flex: unset;
+    }
+
+    .board__logo svg{
+        width: 1.8vw;
+    }
+
+    .board__date h3 {
+        font-size: 1.5vw;
+    }
+    
+    .board__date h4 {
+        font-size: 1.3vw;
+    }
+
+    .board__filter-button {
+        padding: 0.5vw;
+    }
+
+    .board__list,
+    .board__task{
+        gap: 1.5vw;
+        /* padding: 0.5rem 1rem;
+        margin: 1.5rem 0; */
+    }
+
+    .btn-close{
+        font-size: 1.5vw;
+        padding: 0.7vw;
+    }
+
+    .form-input{
+        padding: 10px;
+        margin: 10px 0;
+        border: 0.5vw solid var(--secondary-color);
+    }
 }
