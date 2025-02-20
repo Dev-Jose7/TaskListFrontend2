@@ -9,7 +9,7 @@ export default class TaskRepository{
     }
 
     save(task){
-        if(!this.findById(task.id)){
+        if(!this.findById(task.id) && !this.findByName(task.name)){
             this.#taskArray.push(task);
             this.saveAll();
         }
@@ -34,6 +34,10 @@ export default class TaskRepository{
 
     findById(id){
         return this.#taskArray.find(task => task.id == id);
+    }
+
+    findByName(name){
+        return this.#taskArray.find(task => task.name == name);
     }
 
     remove(task){

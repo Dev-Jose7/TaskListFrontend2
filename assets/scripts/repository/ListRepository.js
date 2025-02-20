@@ -9,7 +9,7 @@ export default class ListRepository{
     }
 
     save(list){
-        if(!this.findById(list.id)){ // Verificar si la lista nueva ya esta almancenada
+        if(!this.findById(list.id) && !this.findByName(list.name)){ // Verificar si la lista nueva ya esta almancenada
             this.#listArray.push(list);
             this.saveAll();
         }
@@ -32,6 +32,10 @@ export default class ListRepository{
         return this.#listArray.find(list => list.id == id);
     }
 
+    findByName(name){
+        return this.#listArray.find(list => list.name == name);
+    }
+
     remove(list){
         let index = this.#listArray.indexOf(list);
         if(index !== -1){
@@ -43,7 +47,7 @@ export default class ListRepository{
     restoreInstance(){
         this.#listArray = []; // Se limpia el contenedor 
         let array = JSON.parse(sessionStorage.getItem("listDB"));
-        
+
         for (const list of array) {
             if(!this.findById(list.id)){
                 let object = new List(list.name); // Se instancian usando los objetos almacenados en sessionStorage
