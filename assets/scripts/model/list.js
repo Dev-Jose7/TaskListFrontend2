@@ -1,28 +1,27 @@
-class List{
+export default class List{
     static counterId = 0;
-    static listArray = [];
 
     #id;
     #name;
     
     constructor(name){
-        this.#id = counterId++;
+        this.#id = ++List.counterId;
         this.#name = name;
     }
 
-    getId(){
+    get id(){
         return this.#id;
     }
 
-    getName(){
+    get name(){
         return this.#name;
     }
 
-    setId(id){
+    set id(id){
         this.#id = id;
     }
 
-    setName(name){
+    set name(name){
         this.#name = name;
     }
 }

@@ -1,58 +1,63 @@
-class Task{
+export default class Task{
     static counterId = 0;
-    static taskArray = [];
 
     #id;
+    #idList
     #name;
     #description;
     #date;
     #status;
 
-    constructor(name, description, date){
-        this.#id = counterId++;
+    constructor(idList, name, description, date){
+        this.#id = ++Task.counterId;
+        this.#idList = idList;
         this.#name = name;
         this.#description = description;
         this.#date = date;
         this.#status = false;
     }
 
-    getId(){
+    get id(){
         return this.#id;
     }
 
-    getName(){
+    get idList(){
+        return this.#idList;
+    }
+
+    get name(){
         return this.#name;
     }
 
-    getDescription(){
+    get description(){
         return this.#description;
     }
 
-    getDate(){
+    get date(){
         return this.#date;
     }
 
-    getStatus(){
+    get status(){
         return this.#status;
     }
 
-    setId(id){
+    set id(id){
         this.#id = id;
     }
 
-    setName(name){
+    set name(name){
         this.#name = name;
     }
 
-    setDescription(description){
+    set description(description){
         this.#description = description;
     }
 
-    setDate(date){
+    set date(date){
         this.#date = date;
     }
 
-    setStatus(status){
+    set status(status){
         this.#status = status;
     }
 }

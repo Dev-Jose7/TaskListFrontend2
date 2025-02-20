@@ -68,7 +68,7 @@ h2{
 
 .board__main{
     height: 100%;
-    padding: 1.5rem;
+    padding: 2vh;
     background: var(--secondary-color);
 }
 
@@ -316,7 +316,7 @@ h2{
 .modal__option{
     display: flex;
     justify-content: space-around;
-    padding: 2rem;
+    padding: 2vh;
 }
 
 .modal__footer {
