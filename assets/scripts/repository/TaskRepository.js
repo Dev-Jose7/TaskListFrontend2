@@ -26,6 +26,7 @@ export default class TaskRepository{
                 status: task.status
             }
         ))));
+        console.log(this.#taskArray)
     }
 
     findAll(){
@@ -40,8 +41,37 @@ export default class TaskRepository{
         return this.#taskArray.find(task => task.name == name);
     }
 
+    findTaskByIdList(idList){
+        return this.#taskArray.filter(task => task.idList == idList);
+    }
+
+    findTaskByDateDay(date, taskByList){
+        taskByList.forEach(e => {
+        });
+        
+        return taskByList.filter(task => task.day == date);
+    }
+
+    findTaskByDateWeek(date, taskByList){
+        return taskByList.filter(task => task.week == date);
+    }
+
+    findTaskByDateMonth(date, taskByList){
+        return taskByList.filter(task => task.month == date);
+    }
+
+    findTaskByDateYear(date, taskByList){
+        return taskByList.filter(task => task.year == date);
+    }
+
     remove(task){
-        let index = this.#taskArray.indexOf(task);
+        let index = -1
+        this.#taskArray.find((t, i) => {
+            if(t.id == task.id){
+                index = i;
+            }
+        })
+
         if(index !== -1){
             this.#taskArray.splice(index, 1);
             this.saveAll();
@@ -50,16 +80,19 @@ export default class TaskRepository{
 
     restoreInstance(){
         this.#taskArray = [];
+        console.log("Antes: ", this.findAll())
         let array = JSON.parse(sessionStorage.getItem("taskDB"));
-
+        console.log(array)
         for (const task of array) {
             if(!this.findById(task.id)){
                 let object = new Task(task.idList, task.name, task.description, task.date);
                 object.id = task.id;
+                object.status = task.status
                 this.#taskArray.push(object);
             }
-        
         }
+
+        console.log("Después: ", this.findAll())
     }
 
     initDB(){

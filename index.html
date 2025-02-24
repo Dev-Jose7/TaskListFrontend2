@@ -13,14 +13,14 @@
 
             <div class="board__header">
                 <h2>Listas</h2>
-                <button class="btn btn__list">
+                <button class="btn btn__list" id="modalAddList">
                     <i class="fas fa-plus"></i>
                     Lista
                 </button>
             </div>
 
-            <div class="board__content">
-                <div class="board__list board__list--selected">
+            <div class="board__content" id="listContainer">
+                <!-- <div class="board__list board__list--selected">
                     <h4>Diarias</h4>
                     <button class="btn btn__list--edit" title="Opciones">···</button>
                 </div>
@@ -58,9 +58,9 @@
                 <div class="board__list">
                     <h4>Lista 5</h4>
                     <button class="btn btn__list--edit">···</button>
-                </div>
+                </div> -->
 
-                
+                <h4>Sin listas</h4>
             </div>
 
             <div class="board__pagination">
@@ -82,7 +82,7 @@
                 </div>
 
                 <div class="board__add">
-                    <button class="btn btn__add">
+                    <button class="btn btn__add" id="modalAddTask">
                         <i class="fas fa-plus"></i>
                         Tarea
                     </button>
@@ -100,14 +100,14 @@
 
             <div class="board__table">
                 <div class="board__filter">
-                    <button class="board__filter-button board__filter-button--selected">Día</button>
+                    <button class="board__filter-button">Día</button>
                     <button class="board__filter-button">Semana</button>
                     <button class="board__filter-button">Mes</button>
                     <button class="board__filter-button">Año</button>    
                 </div>
 
-                <div class="board__content">
-                    <div class="board__task">
+                <div class="board__content" id="taskContainer">
+                    <!-- <div class="board__task">
                         <input type="checkbox">
                         <div class="board__task-text">
                             <h4>Nombre de tarea</h4>
@@ -150,7 +150,9 @@
                             <p>Descripcion</p>
                         </div>
                         <button class="btn btn__list--edit">···</button>
-                    </div>
+                    </div> -->
+
+                    <h4>Sin Tareas</h4>
                 </div>
             </div>
 
@@ -160,14 +162,16 @@
                 <button class="btn btn__page">3</button>
             </div>
         </div>
+
+        <div id="modal"></div>
     </section>
 
-    <div class="modal__container">
+    <!-- <div class="modal__container" id="modalUpdateTask">
         <div class="modal__content">
             <div class="modal__header">
                 <h3>Opciones</h3>
                 <button class="btn-close">
-                    <i class="fas fa-times"></i> <!-- Icono de la X -->
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="modal__body">
@@ -180,10 +184,10 @@
             </div>
             <div class="modal__footer">
                 <button class="btn btn__option">
-                    <i class="fas fa-pen-alt"></i>
+                    <i class="fas fa-pen-alt" id="updateTask"></i>
                     Modificar
                 </button>
-                <button class="btn btn__option">
+                <button class="btn btn__option" id="deleteTask">
                     <i class="fas fa-trash-alt"></i>
                     Eliminar
                 </button>
@@ -191,29 +195,84 @@
         </div>
     </div>
 
-    <div class="modal__container modal__container--form">
+
+
+    <div class="modal__container" id="modalUpdateList">
         <div class="modal__content">
             <div class="modal__header">
-                <h3>Formulario</h3>
+                <h3>Opciones</h3>
                 <button class="btn-close">
-                    <i class="fas fa-times"></i> <!-- Icono de la X -->
+                    <i class="fas fa-times"></i> 
+                </button>
+            </div>
+            <div class="modal__body">
+                <div class="board__task">
+                    <div class="board__task-text">
+                        <h4>Nombre de tarea</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="modal__footer">
+                <button class="btn btn__option" id="updateList">
+                    <i class="fas fa-pen-alt"></i>
+                    Modificar
+                </button>
+                <button class="btn btn__option" id="deleteList">
+                    <i class="fas fa-trash-alt"></i>
+                    Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="modal__container modal__container--form" id="modalAddTask">
+        <div class="modal__content">
+            <div class="modal__header">
+                <h3>Crear tarea</h3>
+                <button class="btn-close">
+                    <i class="fas fa-times"></i> 
                 </button>
             </div>
             <div class="modal__body">
                 <form id="modalForm">
-                    <input type="text" class="form-input" placeholder="Nombre" required>
-                    <input type="date" class="form-input" placeholder="Fecha" required>
-                    <textarea class="form-input" placeholder="Mensaje (Opcional)" rows="4"></textarea>
+                    <input type="text" class="form-input" id="inputNameTask" placeholder="Nombre" required>
+                    <input type="date" class="form-input" id="inputDateTask" placeholder="Fecha" required>
+                    <textarea class="form-input" id="inputDescriptionTask" placeholder="Mensaje (Opcional)" rows="4"></textarea>
                 </form>
             </div>
             <div class="modal__footer modal__footer--one">
-                <button class="btn btn__option" type="submit" form="modalForm">
+                <button class="btn btn__option" type="submit" form="modalForm" id="addTask">
                     <i class="fas fa-plus"></i>
                     Crear
                 </button>
             </div>
         </div>
-    </div>
+    </div> -->
+
+
+
+
+    <!-- <div class="modal__container modal__container--form" id="modalAddList">
+        <div class="modal__content">
+            <div class="modal__header">
+                <h3>Crear lista</h3>
+                <button class="btn-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal__body">
+                <input type="text" class="form-input" id="inputNameList" placeholder="Nombre" required>
+            </div>
+            <div class="modal__footer modal__footer--one">
+                <button class="btn btn__option" type="submit" form="modalForm" id="addList">
+                    <i class="fas fa-plus"></i>
+                    Crear
+                </button>
+            </div>
+        </div>
+    </div> -->
 
     <script src="/assets/scripts/app.js" type="module"></script>
 </body>

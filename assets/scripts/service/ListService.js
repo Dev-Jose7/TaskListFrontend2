@@ -1,11 +1,11 @@
+import ListContainer from "../container/ListContainer.js";
 import List from "../model/list.js";
+import ListRepository from "../repository/ListRepository.js";
 
 export default class ListService { 
-    #listRepository
+    #listRepository = ListContainer.repository();
 
-    constructor(listRepository){
-        this.#listRepository = listRepository;
-    }
+    constructor(){}
 
     createList(name){
         let list = new List(name);
@@ -13,19 +13,8 @@ export default class ListService {
     }
 
     getListAll(){
-        let array = this.#listRepository.findAll();
-        let elemento = ``;
-
-        for (const list of array) {
-            elemento += `
-                <div class="board__list board__list--selected" data-id=${list.id}>
-                    <h4>${list.name}</h4>
-                    <button class="btn btn__list--edit" title="Opciones">···</button>
-                </div>`
-        }
-
-        return elemento;
-        
+        console.log(this.#listRepository.findAll())
+        return this.#listRepository.findAll();
     }
 
     getListById(id){
@@ -39,5 +28,20 @@ export default class ListService {
 
     deleteList(list){
         this.#listRepository.remove(list);
+    }
+
+    templateList(array){
+        let elemento = "";
+
+        for (let i = 0; i < array.length; i++) {
+            elemento += `
+                <div class="board__list ${i == 0 ? "board__list--selected" : ""}" data-id=${array[i].id}>
+                    <h4>${array[i].name}</h4>
+                    <button class="btn btn__list--edit" title="Opciones">···</button>
+                </div>`
+            
+        }
+
+        return elemento;
     }
 }
