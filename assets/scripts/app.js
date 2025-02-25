@@ -17,7 +17,20 @@ import TaskService from "./service/TaskService.js";
     listService.createList("Trabajo");
 
     // taskService.createTask(1, "Ir al Gimnasio", "", "2025-02-22");
-    // taskService.createTask(2, "Reunión 11 AM" , "Cita con equipo en la sala de reuniones", "2025-02-22")
+    // taskService.createTask(1, "Reunión 11 AM" , "Cita con equipo en la sala de reuniones", "2025-02-22")
+
+    taskService.createTask(1, "Comprar víveres", "Comprar comida y bebidas para la semana", "2025-02-23");
+    taskService.createTask(1, "Llamar a la abuela", "Ver cómo está y ponernos al día", "2025-02-23");
+    taskService.createTask(1, "Enviar reporte de ventas", "Enviar el informe del mes al equipo de marketing", "2025-02-23");
+    taskService.createTask(1, "Revisión de código", "Revisar el código del proyecto y solucionar bugs", "2025-02-24");
+    taskService.createTask(1, "Estudiar para examen", "Repasar las lecciones de la clase de historia", "2025-02-24");
+    taskService.createTask(1, "Cita médica", "Revisión general con el doctor a las 4 PM", "2025-02-24");
+    taskService.createTask(1, "Limpiar la casa", "Limpieza general de todos los espacios", "2025-02-25");
+    taskService.createTask(1, "Llamada con cliente", "Discutir propuesta de colaboración con el cliente X", "2025-02-25");
+    taskService.createTask(1, "Paseo con el perro", "Dar una vuelta al parque con el perro", "2025-02-25");
+    taskService.createTask(1, "Hacer ejercicio", "Sesión de cardio en casa", "2025-02-26");
+
+
 
     // taskService.getTaskAll();
     // listService.getListAll();

@@ -81,14 +81,15 @@ export default class TaskService{
         } else {
             for (const task of array) {
                 elemento += `
-                    <div class="board__task ${task.status ? "board__task--selected" : ""}" data-id=${task.id} data-idList=${task.idList}>
-                        <input type="checkbox" class="board__task-check" ${task.status ? "checked" : ""}>
-                        <div class="board__task-text">
-                            <h4>${task.name}</h4>
-                            <p>${task.description}</p>
-                        </div>
-                        <button class="btn btn__list--edit editTask">···</button>
-                    </div>`
+                <div class="board__task ${task.status ? "board__task--selected" : ""}" data-id=${task.id} data-idList=${task.idList}>
+                    <input type="checkbox" class="board__task-check" ${task.status ? "checked" : ""}>
+                    <div class="board__task-text">
+                        <h4>${task.name}</h4>
+                        <p>${task.description}</p>
+                    </div>
+                    <button class="btn btn__list--edit editTask">···</button>
+                </div>`
+                
             }   
         }
 

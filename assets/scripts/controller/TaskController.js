@@ -26,13 +26,21 @@ export default class TaskController{
 
     getTask(filter){ //Se obtiene las tareas por el id de su lista y por el filtro de fecha
         let taskContainer = document.getElementById("taskContainer");
+        let boardPagination = document.getElementById("pageTask");
         let idList = document.getElementById("taskContainer").dataset.idList;
         let date = this.#taskService.getDate();
-        let array = this.#taskService.getTasksByDate(date, filter, this.#taskService.getTaskByList(idList));
-        console.log(array);
+        let tasks = this.#taskService.getTasksByDate(date, filter, this.#taskService.getTaskByList(idList));
+        console.log(tasks);
 
-        taskContainer.innerHTML = ""
-        taskContainer.innerHTML = this.#taskService.templateTask(array);
+        taskContainer.innerHTML = "";
+        boardPagination.innerHTML = "";
+
+        if(tasks.length > 5){
+            // this.createPage(taskContainer);
+            this.pagination(tasks);
+        } else {
+            taskContainer.innerHTML = this.#taskService.templateTask(tasks);
+        }
     }
 
     printTask(){
@@ -223,6 +231,104 @@ export default class TaskController{
             boardDate.querySelector("h3").textContent = dateString[3]
             boardDate.querySelector("h4").textContent =  "\u00A0"
         }
+    }
+
+    // pagination(tasks){
+    //     let taskContainer = document.getElementById("taskContainer");
+    //     let counterTask = 0; // Contador para identificar la cantidad de tareas ya impresas 
+        
+    //     for (let i = 0; i < taskContainer.childNodes.length; i++) {
+    //         let taskPage = []; // Arreglo que almacenará las tareas próximas a ser impresas
+
+    //         for (let j = 0; j < 5; j++) { // Recorrerá un máximo de 5 veces para extrar las tareas usando el contador de tareas ya impresas
+    //             if(counterTask + j < tasks.length){
+    //                 taskPage.push(tasks[counterTask + j]);
+    //             }
+    //         }
+            
+    //         taskContainer.childNodes[i].innerHTML = this.#taskService.templateTask(taskPage);
+    //         taskContainer.childNodes[i].style.display = "none";
+    //         counterTask += 5;  // Suma el contador una vez haya extraido 5 tareas
+
+    //         if(counterTask < tasks.length){
+    //             this.createPage(taskContainer);
+    //         }
+    //     }
+    //     taskContainer.childNodes[0].style.display = "flex";
+    //     this.paginationButtons();
+    // }
+
+    // paginationButtons(){
+    //     let taskContainer = document.getElementById("taskContainer");
+    //     let boardPagination = document.getElementById("pageTask");
+    //     boardPagination.innerHTML = "";
+
+    //     for (let i = 0; i < taskContainer.childNodes.length; i++) {
+    //         let button = document.createElement("BUTTON");
+    //         button.textContent = i + 1;
+    //         button.classList.add("btn", "btn__page")
+    //         boardPagination.appendChild(button);
+
+    //         button.addEventListener("click", function(e){
+    //             [...taskContainer.childNodes].forEach((page, index) => {
+    //                 page.style.display = "none"
+    //                 boardPagination.childNodes[index].classList.remove("btn__page--selected");
+    //             })
+
+    //             taskContainer.childNodes[e.target.textContent - 1].style.display = "flex";
+    //             boardPagination.childNodes[e.target.textContent - 1].classList.add("btn__page--selected");
+    //         });
+    //     }
+
+    //     boardPagination.childNodes[0].classList.add("btn__page--selected")
+    // }
+
+    // createPage(element){
+    //     let page = document.createElement("DIV");
+    //     element.appendChild(page);
+    //     page.classList.add("board__content--page");
+    // }
+
+    pagination(tasks){ // Crea los botones de acuerdo a la cantidad de páginas
+        let pages = Math.ceil(tasks.length / 5);
+        let boardPagination = document.getElementById("pageTask");
+        boardPagination.innerHTML = "";
+        let controller = TaskContainer.controller()
+
+        for (let i = 0; i < pages; i++) {
+            let button = document.createElement("BUTTON");
+            button.textContent = i + 1;
+            button.classList.add("btn", "btn__page")
+            boardPagination.appendChild(button);
+
+            button.addEventListener("click", function(e){
+                [...boardPagination.childNodes].forEach((btn, index) => {
+                    boardPagination.childNodes[index].classList.remove("btn__page--selected");
+                })
+
+                controller.printPage(tasks, e.target.textContent)
+                boardPagination.childNodes[e.target.textContent - 1].classList.add("btn__page--selected");
+            });
+        }
+        
+        this.printPage(tasks, 1);
+        boardPagination.childNodes[0].classList.add("btn__page--selected")
+    }
+
+    printPage(tasks, page){ // Imprime las tareas de la página correspondiente
+        let taskContainer = document.getElementById("taskContainer");
+        let counterTask = (+page * 5) - 5
+        let taskPage = [];
+
+        for (let i = 0; i < 5; i++) { // Recorrerá un máximo de 5 veces para extrar las tareas usando el contador de tareas ya impresas
+            if(counterTask + i < tasks.length){
+                taskPage.push(tasks[counterTask + i]);
+            }
+        }
+
+        taskContainer.innerHTML = ""
+        taskContainer.innerHTML = this.#taskService.templateTask(taskPage);
+        this.modalOption();
     }
 
     init(){

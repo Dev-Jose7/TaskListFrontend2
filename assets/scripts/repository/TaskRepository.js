@@ -80,9 +80,8 @@ export default class TaskRepository{
 
     restoreInstance(){
         this.#taskArray = [];
-        console.log("Antes: ", this.findAll())
         let array = JSON.parse(sessionStorage.getItem("taskDB"));
-        console.log(array)
+        
         for (const task of array) {
             if(!this.findById(task.id)){
                 let object = new Task(task.idList, task.name, task.description, task.date);
@@ -91,8 +90,6 @@ export default class TaskRepository{
                 this.#taskArray.push(object);
             }
         }
-
-        console.log("Después: ", this.findAll())
     }
 
     initDB(){

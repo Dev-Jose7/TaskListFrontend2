@@ -98,7 +98,7 @@ h2{
 
 .board__date{
     text-align: center;
-    padding: 2vh;
+    padding: 1.5vh;
 }
 
 .board__date h3 {
@@ -146,6 +146,11 @@ h2{
     display: flex;
     flex-direction: column;
     margin: 2vh 0;
+    gap: 2vh;
+}
+
+.board__content--page{
+    flex-direction: column;
     gap: 2vh;
 }
 
