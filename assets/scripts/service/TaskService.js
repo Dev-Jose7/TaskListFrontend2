@@ -75,11 +75,13 @@ export default class TaskService{
     }
 
     templateTask(array){
+        console.log(array)
         let elemento = "";
         if(array.length == 0){
             elemento = `<h4>Sin Tareas</h4>`
         } else {
             for (const task of array) {
+                
                 elemento += `
                 <div class="board__task ${task.status ? "board__task--selected" : ""}" data-id=${task.id} data-idList=${task.idList}>
                     <input type="checkbox" class="board__task-check" ${task.status ? "checked" : ""}>

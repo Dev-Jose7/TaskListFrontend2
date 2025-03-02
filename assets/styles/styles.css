@@ -209,8 +209,6 @@ h2{
     gap: 1.5vh;
 }
 
-
-
 .board__add{
     text-align: right;
 }
@@ -278,6 +276,11 @@ h2{
 .btn__page--selected{
     color: var(--primary-color);
     background-color: var(--text-color);
+}
+
+.btn__page--move{
+    display: flex;
+    gap: 2vw;
 }
 
 .btn__option{

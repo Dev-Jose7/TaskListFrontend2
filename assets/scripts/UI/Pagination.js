@@ -1,12 +1,12 @@
 export default class Pagination{
 
-    data
-    dataContainer
-    buttonContainer
-    sizePage
-    printData
+    data;
+    dataContainer;
+    buttonContainer;
+    sizePage;
+    printData;
     counterIndex;
-    allButton
+    startShort = false;
 
     constructor(data, dataContainer, buttonContainer, sizePage, printData){
         this.data = data;
@@ -27,14 +27,12 @@ export default class Pagination{
 
         if(totalPages > 5){
             this.shortPagination(totalPages, 0);
-            this.createNextPrev(mainPagination, true);
         } else {
             this.createButtons(totalPages, mainPagination);
-            this.createNextPrev(mainPagination, true);
-            
         }
         
         this.printPage(1);
+        this.createNextPrev(mainPagination, true);
         mainPagination.childNodes[0].classList.add("btn__page--selected")
     }
 
@@ -58,24 +56,26 @@ export default class Pagination{
                 });
 
                 if(totalPages > 5){
+                    this.startShort = true;
                     // Hace referencia al último boton
                     // Si el elemento clickeado es igual que al ultimo nodo hijo de mainPagination y
                     // El texto del elemento clickeado es diferente al total de paginas
                     if(e.target == mainPagination.childNodes[mainPagination.childNodes.length-1] && 
                         e.target.textContent != totalPages){
-                        this.shortPagination(totalPages, e.target.textContent-1) //Pasa el total de paginas y el texto del boton menos 1, ya que este será un indice para el arreglo Container de shortPagination
-                        mainPagination.childNodes[0].classList.add("btn__page--selected") // Selecciona al primer boton
+                        this.shortPagination(totalPages, e.target.textContent-3) //Pasa el total de paginas y el texto del boton menos 3, ya que este será un indice para el arreglo Container de shortPagination
+                        mainPagination.childNodes[mainPagination.childNodes.length-3].classList.add("btn__page--selected") // Selecciona al tercer boton
                     }
 
                     //Hace referencia al primer botón
                     //Si el elemento clikeado es igual que al primer hijo nodo de mainPagination y
                     //El texto de este botón es diferente a uno
                     if(e.target == mainPagination.childNodes[0] && e.target.textContent != 1){
-                        this.shortPagination(totalPages, (+e.target.textContent-5)); //Pasa el total de paginas y el texto del boton menos 5, ya que este será un indice para el arreglo Container de shortPagination
-                        mainPagination.childNodes[mainPagination.childNodes.length-1].classList.add("btn__page--selected")
+                        this.shortPagination(totalPages, (+e.target.textContent-3)); //Pasa el total de paginas y el texto del boton menos 3, ya que este será un indice para el arreglo Container de shortPagination
+                        mainPagination.childNodes[mainPagination.childNodes.length-3].classList.add("btn__page--selected")
                     }
                 }
-
+                
+                
                 button.classList.add("btn__page--selected")
             });
         });
@@ -92,7 +92,7 @@ export default class Pagination{
         let nextButton = document.createElement("BUTTON");
         let prevButton = document.createElement("BUTTON");
     
-        let counterIndex = 0; // Índice de la página actual
+        let counterIndex = full ? 0 : 2; // Índice de la página actual
     
         // Clases y texto para los botones
         nextButton.classList.add("btn", "btn__page", "btn__page--move");
@@ -106,10 +106,6 @@ export default class Pagination{
     
         // Función para manejar el clic en el botón "prev"
         prevButton.addEventListener("click", () => {
-            if(counterIndex == 0 && full == false){
-                counterIndex = this.sizePage - 1;
-            }
-
             if (counterIndex > 0) {
                 counterIndex--;  // Mover hacia la página anterior
                 mainPagination.children[counterIndex].click();  // Simula un clic en el botón de la página anterior
@@ -127,21 +123,24 @@ export default class Pagination{
         // Añadir los eventos de clic a los botones de paginación
         [...mainPagination.children].forEach((button, index) => {
             button.addEventListener("click", () => {
+                console.log(index)
                 counterIndex = index;  // Actualiza el índice con el botón clickeado
-                this.printPage(index + 1);  // Imprime la página correspondiente
             });
         });
     }
 
     printPage(page){ // Imprime las tareas de la página correspondiente
+        console.log(page)
         let counterTask = (+page * this.sizePage) - this.sizePage;
         let taskPage = [];
-
+        console.log(this.data)
         for (let i = 0; i < +this.sizePage; i++) { // Recorrerá un máximo de 5 veces para extrar las tareas usando el contador de tareas ya impresas
             if(counterTask + i < this.data.length){
                 taskPage.push(this.data[counterTask + i]);
             }
         }
+
+        console.log(taskPage)
 
         this.dataContainer.innerHTML = ""
         this.dataContainer.innerHTML = this.printData(taskPage)
@@ -149,25 +148,30 @@ export default class Pagination{
     }
 
 
-    shortPagination(totalPages, numberPage){
+    shortPagination(totalPages, indexButton){
         let mainPagination = document.getElementById("mainPagination")
+        let lastButton = mainPagination.childNodes[mainPagination.childNodes.length - 1];
         let container = document.createElement("DIV");
         let buttonPage = []
-
+        
         // container.childNodes[numberPage-1].classList.add("btn__page--selected")
-
+        try {
+            console.log(lastButton.classList.contains("btn__page--selected"))
+        } catch (error) {
+            
+        }
         mainPagination.innerHTML = ""
         this.createButtons(totalPages, container);
+        this.createNextPrev(mainPagination, false);
         
         for (let i = 0; i < 5; i++) {
-            if(container.childNodes[i + (numberPage)] != null){
-                buttonPage.push(container.childNodes[i + (numberPage)])
+            if(container.childNodes[i + (indexButton)] != null){ //Extraerá todos los botones del container de acuerdo al indice obtenido (número botón menos 3 para que el boton seleccionado se ubique a la mitad)
+                buttonPage.push(container.childNodes[i + (indexButton)])
             }
         }
 
         buttonPage.forEach(button => {
             mainPagination.appendChild(button)
-            this.createNextPrev(mainPagination, false);
         })
     }
 }
