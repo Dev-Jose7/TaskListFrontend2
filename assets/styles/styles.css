@@ -203,6 +203,14 @@ h2{
     gap: 1.5vh;
 }
 
+.board__pagination div{
+    display: flex;
+    justify-content: center;
+    gap: 1.5vh;
+}
+
+
+
 .board__add{
     text-align: right;
 }

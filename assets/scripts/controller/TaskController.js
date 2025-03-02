@@ -1,4 +1,5 @@
 import TaskContainer from "../container/TaskContainer.js";
+import Pagination from "../UI/Pagination.js";
 
 export default class TaskController{
     #taskService = TaskContainer.service();
@@ -35,12 +36,17 @@ export default class TaskController{
         taskContainer.innerHTML = "";
         boardPagination.innerHTML = "";
 
-        if(tasks.length > 5){
-            // this.createPage(taskContainer);
-            this.pagination(tasks);
-        } else {
-            taskContainer.innerHTML = this.#taskService.templateTask(tasks);
-        }
+        // if(tasks.length > 5){
+        //     // this.createPage(taskContainer);
+        //     this.pagination(tasks);
+        // } else {
+        //     taskContainer.innerHTML = this.#taskService.templateTask(tasks);
+        // }
+
+        // this.pagination(tasks);
+
+        let pagination = new Pagination(tasks, taskContainer, boardPagination, 5, this.taskService.templateTask);
+        pagination.pagination();
     }
 
     printTask(){
@@ -233,6 +239,10 @@ export default class TaskController{
         }
     }
 
+    get taskService(){
+        return this.#taskService;
+    }
+
     // pagination(tasks){
     //     let taskContainer = document.getElementById("taskContainer");
     //     let counterTask = 0; // Contador para identificar la cantidad de tareas ya impresas 
@@ -290,29 +300,212 @@ export default class TaskController{
     // }
 
     pagination(tasks){ // Crea los botones de acuerdo a la cantidad de páginas
-        let pages = Math.ceil(tasks.length / 5);
+        let totalPages = Math.ceil((tasks.length == 0 ? 1 : tasks.length) / 5);
         let boardPagination = document.getElementById("pageTask");
-        boardPagination.innerHTML = "";
-        let controller = TaskContainer.controller()
+        let mainPagination = document.createElement("DIV")
+        mainPagination.id = "mainPagination"
 
-        for (let i = 0; i < pages; i++) {
-            let button = document.createElement("BUTTON");
-            button.textContent = i + 1;
-            button.classList.add("btn", "btn__page")
-            boardPagination.appendChild(button);
+        boardPagination.innerHTML = ""
+        boardPagination.appendChild(mainPagination)
 
-            button.addEventListener("click", function(e){
-                [...boardPagination.childNodes].forEach((btn, index) => {
-                    boardPagination.childNodes[index].classList.remove("btn__page--selected");
-                })
+        // if(totalPages > 5){
+        //     this.paginationButtons(tasks, totalPages, 1);
+        // } else {
+        //     this.createButtons(tasks, totalPages, mainPagination);
+        //     this.createNextPrev(mainPagination);
+        //     mainPagination.childNodes[0].classList.add("btn__page--selected")
+        // }
 
-                controller.printPage(tasks, e.target.textContent)
-                boardPagination.childNodes[e.target.textContent - 1].classList.add("btn__page--selected");
-            });
+        if(totalPages > 5){
+            this.paginationButtons1(tasks, totalPages, 0);
+            this.createNextPrev(mainPagination, true);
+        } else {
+            this.createButtons(tasks, totalPages, mainPagination);
+            this.createNextPrev(mainPagination, true);
+            
         }
         
         this.printPage(tasks, 1);
-        boardPagination.childNodes[0].classList.add("btn__page--selected")
+        mainPagination.childNodes[0].classList.add("btn__page--selected")
+    }
+
+    createButtons(tasks, totalPages, container){
+        let controller = TaskContainer.controller();
+        let boardPagination = document.getElementById("pageTask")
+        let mainPagination = document.getElementById("mainPagination")
+
+        console.log(totalPages)
+        for (let i = 0; i < totalPages; i++) {
+            let button = document.createElement("BUTTON");
+            button.textContent = i + 1;
+            button.classList.add("btn", "btn__page")
+            container.appendChild(button);
+        }
+        
+        console.log(container.childNodes);
+        [...container.childNodes].forEach((button, index) => {
+            button.addEventListener("click", function(e){
+                controller.printPage(tasks, e.target.textContent);
+
+                // if(totalPages > 5){ // Abrevia los botones en caso de ser 5 botones o más
+                //     controller.paginationButtons(tasks, totalPages, e.target.textContent);
+                // }
+
+                [...mainPagination.childNodes].forEach(button => {
+                    button.classList.remove("btn__page--selected")
+                });
+
+                console.log(e.target.textContent)
+                console.log(mainPagination.childNodes.length)
+                console.log(e.target == mainPagination.childNodes[0])
+                
+
+                if(totalPages > 5 && e.target.textContent != 1 && e.target.textContent != container.childNodes.length){
+                    
+                    
+                    console.log(container.childNodes.length)
+                    
+                    if(e.target == mainPagination.childNodes[mainPagination.childNodes.length-1]){
+                        controller.paginationButtons1(tasks, totalPages, +e.target.textContent-1);
+                        console.log(container.childNodes)
+                        mainPagination.childNodes[0].classList.add("btn__page--selected")
+                    }
+                    console.log(e.target == mainPagination.childNodes[0])
+                    console.log(e.target)
+                    console.log(mainPagination.childNodes[0])
+                    
+                    if(e.target == mainPagination.childNodes[0]){
+                        controller.paginationButtons1(tasks, totalPages, (+e.target.textContent-5));
+                        mainPagination.childNodes[e.target.textContent-1].classList.add("btn__page--selected")
+                    }
+
+                    // Condición para quitar el seleccionado de todos los botones boardPagination
+                    
+                    
+                }
+                
+                [...container.childNodes].forEach(btn => {
+                    btn.classList.remove("btn__page--selected")
+                })
+
+                button.classList.add("btn__page--selected")
+            });
+
+        });
+    }
+
+    // createNextPrev(mainPagination){
+    //     let boardPagination = document.getElementById("pageTask")
+    //     let nextButton = document.createElement("BUTTON")
+    //     let prevButton = document.createElement("BUTTON")
+    //     let counterPage = 0
+        
+    //     // Limpia los botones para evitar duplicados
+    //     if(document.querySelectorAll(".btn__page--move")){
+    //         [...document.querySelectorAll(".btn__page--move")].forEach(button => {
+    //             button.remove();
+    //         })
+    //     }
+    
+    //     nextButton.classList.add("btn", "btn__page", "btn__page--move");
+    //     prevButton.classList.add("btn", "btn__page", "btn__page--move")
+    //     nextButton.textContent = ">";
+    //     prevButton.textContent = "<";
+
+    //     boardPagination.prepend(prevButton);
+    //     boardPagination.appendChild(nextButton);
+
+    //     prevButton.addEventListener("click", function(){
+    //         console.log(counterPage)
+    //         if(counterPage > 0){
+    //             counterPage--
+    //             mainPagination.childNodes[counterPage].click()
+                
+    //             console.log(mainPagination.childNodes[counterPage])
+    //             console.log(counterPage)
+    //         }
+    //     });
+
+    //     nextButton.addEventListener("click", function(){
+    //         console.log(mainPagination)
+    //         console.log("Length: ", mainPagination.childNodes.length)
+    //         if(counterPage < mainPagination.childNodes.length-1){
+    //             counterPage++
+    //             mainPagination.childNodes[counterPage].click()
+                
+    //             console.log(mainPagination.childNodes[counterPage])
+    //             console.log(counterPage)
+    //         }
+    //     });
+
+        
+    // }
+
+    createNextPrev(mainPagination, full){
+
+    
+
+        console.log("Length: ", mainPagination.childNodes.length)
+        // Limpia los botones para evitar duplicados
+        if(document.querySelectorAll(".btn__page--move")){
+            [...document.querySelectorAll(".btn__page--move")].forEach(button => {
+                button.remove();
+            })
+        }
+
+        let boardPagination = document.getElementById("pageTask")
+        let nextButton = document.createElement("BUTTON")
+        let prevButton = document.createElement("BUTTON")
+        let counterIndex = 0
+    
+        nextButton.classList.add("btn", "btn__page", "btn__page--move");
+        prevButton.classList.add("btn", "btn__page", "btn__page--move")
+        nextButton.textContent = ">";
+        prevButton.textContent = "<";
+
+        boardPagination.prepend(prevButton);
+        boardPagination.appendChild(nextButton);
+
+        prevButton.addEventListener("click", function(){
+            console.log(counterIndex)
+            if(counterIndex == 0 && full == false){
+                counterIndex = 5-1
+            }
+
+            
+                counterIndex--
+                mainPagination.childNodes[counterIndex].click()
+            
+
+            // [...mainPagination.childNodes].forEach(button => {
+            //     button.addEventListener("click", function(){
+            //         counterPage = button.textContent-1;
+            //     })
+            // })
+        });
+
+        
+
+        nextButton.addEventListener("click", function(){
+            console.log(counterIndex)
+            console.log(mainPagination.childNodes.length-1)
+            console.log(mainPagination)
+            if(counterIndex < mainPagination.childNodes.length-1){
+                
+                counterIndex++
+                console.log(counterIndex)
+                mainPagination.childNodes[counterIndex].click();
+            }
+
+            // [...mainPagination.childNodes].forEach(button => {
+            //     button.addEventListener("click", function(){
+            //         counterPage = button.textContent-1;
+            //     })
+            // })
+        });
+
+        
+        
     }
 
     printPage(tasks, page){ // Imprime las tareas de la página correspondiente
@@ -329,6 +522,210 @@ export default class TaskController{
         taskContainer.innerHTML = ""
         taskContainer.innerHTML = this.#taskService.templateTask(taskPage);
         this.modalOption();
+    }
+
+    // paginationButtons(tasks, totalPages, numberPage){
+    //     let boardPagination = document.getElementById("pageTask");
+    //     let counterButton = 0;
+    //     let container = document.createElement("DIV");
+    //     let buttonPage = [];
+        
+    //     boardPagination.innerHTML = ""
+    //     this.createButtons(tasks, totalPages, container);
+        
+
+    //     let lengthContainer = container.childNodes.length
+    //     let firstButton = container.childNodes[0];
+    //     let lastButton = container.childNodes[lengthContainer-1]
+    //     let buttonContainer = document.createElement("DIV");
+    //     buttonContainer.classList.add("board__pagination--page")
+    //     let prev = document.createElement("P")
+    //     let next = document.createElement("P")
+    //     prev.innerHTML = "...";
+    //     next.innerHTML = "...";
+
+        
+
+    //     //Evita salirse de los indice de arreglo de botones al usar firstButton y lastButton
+    //     if(numberPage != 1 && numberPage != lengthContainer){
+    //         counterButton = numberPage - 2
+    //     } else if(numberPage == lengthContainer){
+    //         counterButton = numberPage - 3
+    //     }
+        
+    //     for (let i = 0; i < 3; i++) {
+    //         if(counterButton == 0){
+    //             counterButton++;
+    //         } else if(counterButton == lengthContainer-3){
+    //             counterButton--;
+    //         }
+
+    //         buttonPage.push(container.childNodes[counterButton + i])
+    //     }
+        
+
+    //     if(numberPage != 1 && numberPage != lengthContainer){
+    //         counterButton = numberPage - 2
+    //     } else if(numberPage == lengthContainer){
+    //         counterButton = numberPage - 3
+    //     }
+        
+    //     for (let i = 0; i < 3; i++) {
+    //         if(counterButton == 0){
+    //             counterButton++;
+    //         } else if(counterButton == lengthContainer-3){
+    //             counterButton--;
+    //         }
+
+    //         buttonPage.push(container.childNodes[counterButton + i])
+    //     }
+
+    //     buttonPage.forEach(button => {
+    //         buttonContainer.appendChild(button);
+            
+    //     })
+        
+    //     boardPagination.appendChild(firstButton);
+    //     boardPagination.appendChild(buttonContainer);
+    //     boardPagination.appendChild(lastButton);
+
+        
+        
+    //     if(numberPage < lengthContainer-2){ 
+    //         buttonContainer.appendChild(next)
+    //     } 
+
+    //     if(numberPage > 3){
+    //         buttonContainer.prepend(prev);
+    //     }
+    // }
+
+    paginationButtons(tasks, totalPages, numberPage){
+        let boardPagination = document.getElementById("pageTask");
+        let mainPagination = document.getElementById("mainPagination")
+        let container = document.createElement("DIV");
+        let firstContainer = document.createElement("DIV");
+        let lastContainer = document.createElement("DIV");
+        let buttonContainer = document.createElement("DIV");
+        let dots1 = document.createElement("P")
+        let dots2 = document.createElement("P")
+        dots1.textContent = "...";
+        dots2.textContent = "...";
+        let counterButton = 0;
+        let buttonPage = [];
+    
+        this.createButtons(tasks, totalPages, container);
+        let lengthContainer = container.childNodes.length
+        let firstButton = container.childNodes[0];
+        let lastButton = container.childNodes[lengthContainer-1]
+        
+        firstContainer.classList.add("board__pagination--page")
+        buttonContainer.classList.add("board__pagination--page")
+        lastContainer.classList.add("board__pagination--page");
+
+        if(numberPage){ // Condición para quitar el seleccionado de todos los botones boardPagination
+            [...mainPagination.childNodes].forEach(element => {
+                if(element.tagName == "DIV"){
+                    [...element.childNodes].forEach(button => {
+                        button.classList.remove("btn__page--selected")
+                    })
+                }
+            });
+        }
+
+        container.childNodes[numberPage-1].classList.add("btn__page--selected")
+
+        if (numberPage == 1 || numberPage == 4){
+            counterButton = 0
+            createContainers(firstContainer, 0)
+            mainPagination.innerHTML = "";
+            mainPagination.appendChild(firstContainer);
+            mainPagination.appendChild(buttonContainer.appendChild(dots1));
+            mainPagination.appendChild(lastContainer.appendChild(lastButton));
+        } 
+
+        if (numberPage >= 5 && numberPage <= (lengthContainer - 4)){
+            counterButton = numberPage - 2;
+            createContainers(buttonContainer, 1)
+            console.log("Entro")
+            
+            mainPagination.innerHTML = ""
+            
+            firstContainer.appendChild(firstButton)
+            firstContainer.appendChild(dots1)
+
+            lastContainer.appendChild(lastButton)
+            lastContainer.prepend(dots2)
+
+            mainPagination.prepend(firstContainer)
+            mainPagination.appendChild(buttonContainer);
+            mainPagination.appendChild(lastContainer);
+        }
+        
+        if (numberPage == lengthContainer || numberPage == (lengthContainer - 3)){
+            counterButton = lengthContainer - 5;
+            createContainers(lastContainer, 0)
+            
+            mainPagination.innerHTML = "";
+            mainPagination.prepend(firstContainer.appendChild(firstButton))
+            mainPagination.appendChild(buttonContainer.appendChild(dots2))
+            mainPagination.appendChild(lastContainer);
+        }
+
+        if(numberPage == 1){
+            this.createNextPrev(firstContainer);
+        } else if(numberPage >= 5 && numberPage <= (lengthContainer-4)){
+             this.createNextPrev(buttonContainer);
+        } else if(numberPage == lengthContainer-3){
+             this.createNextPrev(lastContainer);
+        }
+
+
+        function createContainers(div, type){
+            let cantButton = 0
+            type ? cantButton = 3 : cantButton = 5
+            for (let i = 0; i < cantButton; i++) {
+                buttonPage.push(container.childNodes[counterButton + i])
+            }
+            
+            buttonPage.forEach(button => {
+                div.appendChild(button)
+            });
+        }
+    }
+    
+    paginationButtons1(tasks, totalPages, numberPage){
+        let mainPagination = document.getElementById("mainPagination")
+        let container = document.createElement("DIV");
+        let buttonContainer = document.createElement("DIV");
+        let buttonPage = []
+
+        
+
+        // container.childNodes[numberPage-1].classList.add("btn__page--selected")
+
+        mainPagination.innerHTML = ""
+        this.createButtons(tasks, totalPages, container);
+        console.log(container)
+        console.log(totalPages)
+        console.log(numberPage)
+        
+        for (let i = 0; i < 5; i++) {
+            if(container.childNodes[i + (numberPage)] != null){
+                buttonPage.push(container.childNodes[i + (numberPage)])
+            }
+        }
+
+        console.log(numberPage)
+        console.log(buttonPage)
+
+        buttonPage.forEach(button => {
+            mainPagination.appendChild(button)
+            this.createNextPrev(mainPagination, false);
+        })
+
+        console.log(mainPagination)
+
     }
 
     init(){
