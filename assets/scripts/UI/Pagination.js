@@ -1,5 +1,4 @@
 export default class Pagination{
-
     data;
     dataContainer;
     buttonContainer;
@@ -11,6 +10,8 @@ export default class Pagination{
     next = false // Indica si la paginación esta yendo hacias adelante
     firstButtons = false; // Indica si el primer grupo de botones fueron creados
     lastButtons = false // Indica si el último grupo de botones fueron creados
+    indexFirst = false;
+    indexLast = false;
 
     constructor(data, dataContainer, buttonContainer, sizePage, printData){
         this.data = data;
@@ -35,7 +36,7 @@ export default class Pagination{
         }
         
         this.printPage(1);
-        this.createNextPrev(mainPagination, true);
+        this.createNextPrev(mainPagination, 0);
         mainPagination.childNodes[0].classList.add("btn__page--selected")
     }
 
@@ -74,10 +75,9 @@ export default class Pagination{
                     if(e.target == mainPagination.childNodes[0] && e.target.textContent != 1){
                         this.startShort = true;
                         this.lastButtons = false;
-                        this.shortPagination((+e.target.textContent-2)); //Pasa el total de paginas y el texto del boton menos 3, ya que este será un indice para el arreglo Container de shortPagination
+                        this.shortPagination((e.target.textContent-2)); //Pasa el total de paginas y el texto del boton menos 3, ya que este será un indice para el arreglo Container de shortPagination
                         mainPagination.childNodes[mainPagination.childNodes.length-2].classList.add("btn__page--selected")
                     }
-
                 }
                 
                 button.classList.add("btn__page--selected")
@@ -85,7 +85,7 @@ export default class Pagination{
         });
     }
 
-    createNextPrev(mainPagination, full) {
+    createNextPrev(mainPagination, index) {
         // Limpia los botones de 'next' y 'prev' para evitar duplicados
         let moveButtons = document.querySelectorAll(".btn__page--move");
         if (moveButtons.length > 0) {
@@ -95,10 +95,26 @@ export default class Pagination{
         let boardPagination = document.getElementById("pageTask");
         let nextButton = document.createElement("BUTTON");
         let prevButton = document.createElement("BUTTON");
-    
-        let counterIndex = full ? 0 : 1; // Índice de la página actual
-        this.firstButtons && this.prev ? counterIndex = 3 : counterIndex; // Si se activan los primeros 5 botones la posición de los botones de desplazamiento será de 3 (4 botón)
-        !this.startShort ? counterIndex = 0 : counterIndex;
+
+        // Si se crean los primeros 5 botones y la paginación va en reversa (click [<]) el index iniciará en 3 para que el regreso continúe
+        if(this.firstButtons && this.prev){
+            index = 3;
+        }
+
+        // Si se hace click en el primer boton cuando la paginación este abreviada, el index inicia en cero para que su avance sea continúo
+        if(this.indexFirst){
+            index = 0;
+        }
+
+        // Si la paginación está abreviada y se esta avanzando (click [>])  o retrocediendo (click [<]) el index empieza en 1 para un desplazamiento continúo
+        if(this.startShort && this.prev || this.startShort && this.next){
+            index = 1
+        }
+
+        // / Si se crean los ultimos 5 botones y la paginación va en reversa (click [>]) el index iniciará en 4 para que el avance continúe
+        if(this.indexLast){
+            index = 4
+        }
 
         // Clases y texto para los botones
         nextButton.classList.add("btn", "btn__page--move");
@@ -115,9 +131,9 @@ export default class Pagination{
             this.prev = true;
             this.next = false;
             // this.firstButtons ? counterIndex = 3 : counterIndex;
-            if (counterIndex > 0) {
-                counterIndex--;  // Mover hacia la página anterior
-                mainPagination.children[counterIndex].click();  // Simula un clic en el botón de la página anterior
+            if (index > 0) {
+                index--;  // Mover hacia la página anterior
+                mainPagination.children[index].click();  // Simula un clic en el botón de la página anterior
             }
         });
     
@@ -125,17 +141,16 @@ export default class Pagination{
         nextButton.addEventListener("click", () => {
             this.next = true;
             this.prev = false;
-            if (counterIndex < mainPagination.children.length - 1) {
-                counterIndex++;  // Mover hacia la página siguiente
-                mainPagination.children[counterIndex].click();  // Simula un clic en el botón de la siguiente página
+            if (index < mainPagination.children.length - 1) {
+                index++;  // Mover hacia la página siguiente
+                mainPagination.children[index].click();  // Simula un clic en el botón de la siguiente página
             }
         });
     
         // Añadir los eventos de clic a los botones de paginación
-        [...mainPagination.children].forEach((button, index) => {
+        [...mainPagination.children].forEach((button, i) => {
             button.addEventListener("click", () => {
-                console.log(index)
-                counterIndex = index;  // Actualiza el índice con el botón clickeado
+                index = i;  // Actualiza el índice con el botón clickeado
             });
         });
     }
@@ -155,8 +170,7 @@ export default class Pagination{
         // this.modalOption(); 
     }
 
-
-    shortPagination(indexButton){
+    shortPagination(indexButton){ // indexButton hace referencia al indice del boton (de container) desde donde se extraerán los botones a insertar
         let mainPagination = document.getElementById("mainPagination");
         let container = document.createElement("DIV");
         let buttonPage = []
@@ -166,35 +180,66 @@ export default class Pagination{
         mainPagination.innerHTML = "";
         this.createButtons(container);
 
-        // Crea el primer botón y último cuando la paginación se abrevia (corta)
-        if(this.startShort){
-            if(!document.getElementById("containerFirstButton") && !document.getElementById("containerLastButton")){
-                this.createFirstLastButtons(container);
+        // indexButton es cero cuando se carga la paginación por primer vez, si se hace click en el primer botón (1) se creará el último
+        if(indexButton == 0 || this.indexFirst){
+            if(!document.getElementById("containerLastButton")){
+                this.createFirstLastButtons(container, "last");
             }
         }
 
-        // Hace referencia al último grupo de 5 botones (1, 2, 3, 4, 5)
-        if(this.next && indexButton == container.childNodes.length-5){
+        // Si se hace click en el ultimo boton ej (11) creará el primer boton (1)
+        if(this.indexLast){ 
+            console.log(container)
+            if(!document.getElementById("containerFirstButton")){
+                this.createFirstLastButtons(container, "first");
+            }
+        }
+
+        // Crea el primer botón y último cuando la paginación se abrevia (corta)
+        if(this.startShort){
+            if(!document.getElementById("containerFirstButton")){
+                this.createFirstLastButtons(container, "first");
+            }
+
+            if(!document.getElementById("containerLastButton")){
+                this.createFirstLastButtons(container, "last");
+            }
+        }
+
+        // Creará al último grupo de 5 botones ej: (7, 8, 9, 10, 11)
+        if(this.next && indexButton == container.childNodes.length-5 || indexButton == container.childNodes.length-5 ||
+            this.indexLast){ // Si se hace click en el 8 boton
             index = 5;
             this.startShort = false;
             this.lastButtons = true;
-            document.getElementById("containerFirstButton").remove();
+            // document.getElementById("containerFirstButton").remove();
             document.getElementById("containerLastButton").remove();
         }
 
-        // Hace referencia al primer grupo de 5 botones ej: (7, 8, 9, 10, 11)
-        if(this.prev && indexButton == 2){
+        // Creará al primer grupo de 5 botones (1, 2, 3, 4, 5)
+        if(this.prev && indexButton == 2 || indexButton == 2){ // Si se hace click en el 4 buton
             index = 5
             indexButton = 0;
             this.startShort = false;
             this.firstButtons = true;
             document.getElementById("containerFirstButton").remove();
-            document.getElementById("containerLastButton").remove();
+            // document.getElementById("containerLastButton").remove();
         }
 
-        this.createNextPrev(mainPagination, false);
+        // Corregirá el indexButton cuando se acceda a los últimos 5 botones mediante el ultimo botón,
+        // Esto debido ya que container contará con 8 botones en lugar de 6 por el corte de la paginación que solo toma tres botones
+        if(this.indexLast && !this.startShort && indexButton == container.childNodes.length-3){
+            indexButton = indexButton-2
+        }
+
+        // console.log("indexLast:", this.indexLast);
+        // console.log("indexFirst:", this.indexFirst);
+        // console.log("index: ", index)
+        // console.log("indexButton: ", indexButton);
+        // console.log(" ");
 
         for (let i = 0; i < index; i++) {
+            console.log("En el for: ", container.childNodes[i + (indexButton)])
             if(container.childNodes[i + (indexButton)] != null){ //Extraerá todos los botones del container de acuerdo al indice obtenido (número botón menos 3 para que el boton seleccionado se ubique a la mitad)
                 buttonPage.push(container.childNodes[i + (indexButton)])
             }
@@ -203,52 +248,66 @@ export default class Pagination{
         buttonPage.forEach(button => {
             mainPagination.appendChild(button)
         })
+
+        // Una vez creados y añadidos los botones a mainPagination se crean los botones de desplazamiento y se añade eventos de tipo click a los botones despúes de abreviar la paginación
+        this.createNextPrev(mainPagination, 1);
+
+        if(this.indexFirst){
+            mainPagination.childNodes[0].classList.add("btn__page--selected")
+        }
+
+        if(this.indexLast){
+            mainPagination.childNodes[mainPagination.childNodes.length-1].classList.add("btn__page--selected")
+        }
     }
 
-    createFirstLastButtons(container){
+    createFirstLastButtons(container, type){
         let firstButton = document.createElement("BUTTON");
         let lastButton = document.createElement("BUTTON");
-        let containerFirstButton = document.createElement("DIV");
-        let containerLastButton = document.createElement("DIV");
-        let dotsFirst = document.createElement("P");
-        let dotsLast = document.createElement("P");
-        firstButton.textContent = 1;
-        lastButton.textContent = container.childNodes.length;
-        containerFirstButton.id = "containerFirstButton";
-        containerLastButton.id = "containerLastButton";
-        dotsFirst.textContent = "...";
-        dotsLast.textContent = "...";
-        firstButton.classList.add("btn", "btn__page");
-        lastButton.classList.add("btn", "btn__page");
-        containerFirstButton.prepend(firstButton);
-        containerFirstButton.appendChild(dotsFirst);
-        containerLastButton.prepend(dotsLast);
-        containerLastButton.appendChild(lastButton);
-        this.buttonContainer.prepend(containerFirstButton);
-        this.buttonContainer.appendChild(containerLastButton);
 
-        firstButton.addEventListener("click", (e) => {
+        if(type == "first"){
+            let containerFirstButton = document.createElement("DIV");
+            let dotsFirst = document.createElement("P");
+            firstButton.textContent = 1;
+            containerFirstButton.id = "containerFirstButton";
+            dotsFirst.textContent = "...";
+            firstButton.classList.add("btn", "btn__page");
+            containerFirstButton.prepend(firstButton);
+            containerFirstButton.appendChild(dotsFirst);
+            this.buttonContainer.prepend(containerFirstButton);
+        }
+
+        if(type == "last"){
+            let containerLastButton = document.createElement("DIV");
+            let dotsLast = document.createElement("P");
+            lastButton.textContent = container.childNodes.length;
+
+            console.log(container.childNodes.length)
+            containerLastButton.id = "containerLastButton";
+            dotsLast.textContent = "...";
+            lastButton.classList.add("btn", "btn__page");
+            containerLastButton.prepend(dotsLast);
+            containerLastButton.appendChild(lastButton);
+            this.buttonContainer.appendChild(containerLastButton);
+        }
+
+        firstButton.addEventListener("click", () => {
             this.startShort = false;
-            this.shortPagination(0);
+            this.indexFirst = true;
+            this.shortPagination(2);
             this.printPage(firstButton.textContent)
-            document.getElementById("containerFirstButton").remove();
-            document.getElementById("containerLastButton").remove();
 
-            
+            this.indexFirst = false;
         });
 
-        lastButton.addEventListener("click", (e) => {
+        lastButton.addEventListener("click", () => {
             this.startShort = false;
-            this.shortPagination(container.childNodes.length-2);
+            this.indexLast = true;
+            console.log("en cFLbuttons: ", container.childNodes.length)
+            this.shortPagination(container.childNodes.length);
+            this.printPage(lastButton.textContent);
 
-            e.target.classList.add("btn__page--selected")
-            this.printPage(lastButton.textContent)
-            try {
-                document.getElementById("containerFirstButton").remove();
-                document.getElementById("containerLastButton").remove();
-            } catch (error) {
-                
-            }
+            this.indexLast = false;
         });
     }
 }
