@@ -47,6 +47,7 @@ export default class TaskController{
 
         let pagination = new Pagination(tasks, taskContainer, boardPagination, 5, this.taskService.templateTask);
         pagination.pagination();
+        this.modalOption(); 
     }
 
     printTask(){
