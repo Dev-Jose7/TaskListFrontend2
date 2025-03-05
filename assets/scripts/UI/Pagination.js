@@ -1,30 +1,27 @@
 export default class Pagination{
-    data;
-    dataContainer;
-    buttonContainer;
-    sizePage;
-    printData;
-    totalPages;
-    startShort = false; // Indica si la paginación se ha abreviado (cortado)
-    prev = false; // Indica si la paginación esta yendo hacias atrás
-    next = false // Indica si la paginación esta yendo hacias adelante
-    firstButtons = false; // Indica si el primer grupo de botones fueron creados
-    lastButtons = false // Indica si el último grupo de botones fueron creados
-    indexFirst = false;
-    indexLast = false;
+    static counterId = 0;
 
     constructor(data, dataContainer, buttonContainer, sizePage, printData){
+        this.id = ++Pagination.counterId;
         this.data = data;
         this.dataContainer = dataContainer;
         this.buttonContainer = buttonContainer;
         this.sizePage = sizePage;
         this.printData = printData;
+        this.totalPages;
+        this.startShort = false; // Indica si la paginación se ha abreviado (cortado)
+        this.prev = false; // Indica si la paginación esta yendo hacias atrás
+        this.next = false // Indica si la paginación esta yendo hacias adelante
+        this.firstButtons = false; // Indica si el primer grupo de botones fueron creados
+        this.lastButtons = false // Indica si el último grupo de botones fueron creados
+        this.indexFirst = false; // Indica si el primer boton ha recibido click
+        this.indexLast = false; // Indica si el último boton ha recibido click
     }
 
-    pagination(){ // Crea los botones de acuerdo a la cantidad de páginas
+    pagination(){ // Inicia la paginación creando los botones de acuerdo a la cantidad de páginas
         this.totalPages = Math.ceil((this.data.length == 0 ? 1 : this.data.length) / this.sizePage);
         let mainPagination = document.createElement("DIV")
-        mainPagination.id = "mainPagination"
+        mainPagination.id = `mainPagination${this.id}`
 
         this.buttonContainer.innerHTML = ""
         this.buttonContainer.appendChild(mainPagination);
@@ -37,11 +34,17 @@ export default class Pagination{
         
         this.printPage(1);
         this.createNextPrev(mainPagination, 0);
-        mainPagination.childNodes[0].classList.add("btn__page--selected")
+        
+        try {
+            mainPagination.childNodes[0].classList.add("btn__page--selected")
+        } catch (error) {
+            
+        }
+        
     }
 
-    createButtons(container){
-        let mainPagination = document.getElementById("mainPagination");
+    createButtons(container){ // Se encarga de crear los botones de acuerdo a la cantidad de paginas calculados por el método pagination
+        let mainPagination = document.getElementById(`mainPagination${this.id}`);
         
         for (let i = 0; i < this.totalPages; i++) {
             let button = document.createElement("BUTTON");
@@ -85,14 +88,13 @@ export default class Pagination{
         });
     }
 
-    createNextPrev(mainPagination, index) {
+    createNextPrev(mainPagination, index) { // Crea los botones de desplazamiento (< >)
         // Limpia los botones de 'next' y 'prev' para evitar duplicados
-        let moveButtons = document.querySelectorAll(".btn__page--move");
+        let moveButtons = document.querySelectorAll(`.btn__page--move${this.id}`);
         if (moveButtons.length > 0) {
             moveButtons.forEach(button => button.remove());
         }
     
-        let boardPagination = document.getElementById("pageTask");
         let nextButton = document.createElement("BUTTON");
         let prevButton = document.createElement("BUTTON");
 
@@ -117,14 +119,14 @@ export default class Pagination{
         }
 
         // Clases y texto para los botones
-        nextButton.classList.add("btn", "btn__page--move");
-        prevButton.classList.add("btn", "btn__page--move");
+        nextButton.classList.add("btn", "btn__page--move", `btn__page--move${this.id}`);
+        prevButton.classList.add("btn", "btn__page--move", `btn__page--move${this.id}`);
         nextButton.textContent = ">";
         prevButton.textContent = "<";
     
         // Agregar los botones al DOM
-        boardPagination.prepend(prevButton);
-        boardPagination.appendChild(nextButton);
+        this.buttonContainer.prepend(prevButton);
+        this.buttonContainer.appendChild(nextButton);
     
         // Función para manejar el clic en el botón "prev"
         prevButton.addEventListener("click", () => {
@@ -155,23 +157,24 @@ export default class Pagination{
         });
     }
 
-    printPage(page){ // Imprime los datos de la página correspondiente
-        let counterTask = (+page * this.sizePage) - this.sizePage;
-        let taskPage = [];
+    printPage(page){ // Imprime los datos de la página recibida en el parametro page
+        let indexData = (+page * this.sizePage) - this.sizePage; // Se ubicará en el objeto exacto para empezar a llenar la pagina
+        let pageData = [];
 
-        for (let i = 0; i < +this.sizePage; i++) { // Recorrerá un máximo de 5 veces para extrar las tareas usando el contador de tareas ya impresas
-            if(counterTask + i < this.data.length){
-                taskPage.push(this.data[counterTask + i]);
+        for (let i = 0; i < +this.sizePage; i++) { // Recorrerá según el tamaño de página para extrar las tareas usando el indexData
+            if(indexData + i < this.data.length){
+                pageData.push(this.data[indexData + i]);
             }
         }
 
         this.dataContainer.innerHTML = ""
-        this.dataContainer.innerHTML = this.printData(taskPage)
+        this.dataContainer.innerHTML = this.printData(pageData)
         // this.modalOption(); 
     }
 
+    // Se encarga de abreviar la páginación
     shortPagination(indexButton){ // indexButton hace referencia al indice del boton (de container) desde donde se extraerán los botones a insertar
-        let mainPagination = document.getElementById("mainPagination");
+        let mainPagination = document.getElementById(`mainPagination${this.id}`);
         let container = document.createElement("DIV");
         let buttonPage = []
 
@@ -182,7 +185,7 @@ export default class Pagination{
 
         // indexButton es cero cuando se carga la paginación por primer vez, si se hace click en el primer botón (1) se creará el último
         if(indexButton == 0 || this.indexFirst){
-            if(!document.getElementById("containerLastButton")){
+            if(!document.getElementById(`containerLastButton${this.id}`)){
                 this.createFirstLastButtons(container, "last");
             }
         }
@@ -190,18 +193,18 @@ export default class Pagination{
         // Si se hace click en el ultimo boton ej (11) creará el primer boton (1)
         if(this.indexLast){ 
             console.log(container)
-            if(!document.getElementById("containerFirstButton")){
+            if(!document.getElementById(`containerFirstButton${this.id}`)){
                 this.createFirstLastButtons(container, "first");
             }
         }
 
         // Crea el primer botón y último cuando la paginación se abrevia (corta)
         if(this.startShort){
-            if(!document.getElementById("containerFirstButton")){
+            if(!document.getElementById(`containerFirstButton${this.id}`)){
                 this.createFirstLastButtons(container, "first");
             }
 
-            if(!document.getElementById("containerLastButton")){
+            if(!document.getElementById(`containerLastButton${this.id}`)){
                 this.createFirstLastButtons(container, "last");
             }
         }
@@ -213,7 +216,7 @@ export default class Pagination{
             this.startShort = false;
             this.lastButtons = true;
             // document.getElementById("containerFirstButton").remove();
-            document.getElementById("containerLastButton").remove();
+            document.getElementById(`containerLastButton${this.id}`).remove();
         }
 
         // Creará al primer grupo de 5 botones (1, 2, 3, 4, 5)
@@ -222,7 +225,7 @@ export default class Pagination{
             indexButton = 0;
             this.startShort = false;
             this.firstButtons = true;
-            document.getElementById("containerFirstButton").remove();
+            document.getElementById(`containerFirstButton${this.id}`).remove();
             // document.getElementById("containerLastButton").remove();
         }
 
@@ -249,8 +252,6 @@ export default class Pagination{
             mainPagination.appendChild(button)
         })
 
-        // Una vez creados y añadidos los botones a mainPagination se crean los botones de desplazamiento y se añade eventos de tipo click a los botones despúes de abreviar la paginación
-        this.createNextPrev(mainPagination, 1);
 
         if(this.indexFirst){
             mainPagination.childNodes[0].classList.add("btn__page--selected")
@@ -259,9 +260,12 @@ export default class Pagination{
         if(this.indexLast){
             mainPagination.childNodes[mainPagination.childNodes.length-1].classList.add("btn__page--selected")
         }
+
+        // Una vez creados y añadidos los botones a mainPagination se crean los botones de desplazamiento y se añade eventos de tipo click a los botones despúes de abreviar la paginación
+        this.createNextPrev(mainPagination, 1);
     }
 
-    createFirstLastButtons(container, type){
+    createFirstLastButtons(container, type){ // Crea el primer y/o el ultimo boton de la paginación de acuerdo a la posición del usuario (determinado en shortPagination)
         let firstButton = document.createElement("BUTTON");
         let lastButton = document.createElement("BUTTON");
 
@@ -269,7 +273,7 @@ export default class Pagination{
             let containerFirstButton = document.createElement("DIV");
             let dotsFirst = document.createElement("P");
             firstButton.textContent = 1;
-            containerFirstButton.id = "containerFirstButton";
+            containerFirstButton.id = `containerFirstButton${this.id}`;
             dotsFirst.textContent = "...";
             firstButton.classList.add("btn", "btn__page");
             containerFirstButton.prepend(firstButton);
@@ -283,7 +287,7 @@ export default class Pagination{
             lastButton.textContent = container.childNodes.length;
 
             console.log(container.childNodes.length)
-            containerLastButton.id = "containerLastButton";
+            containerLastButton.id = `containerLastButton${this.id}`
             dotsLast.textContent = "...";
             lastButton.classList.add("btn", "btn__page");
             containerLastButton.prepend(dotsLast);

@@ -36,17 +36,8 @@ export default class TaskController{
         taskContainer.innerHTML = "";
         boardPagination.innerHTML = "";
 
-        // if(tasks.length > 5){
-        //     // this.createPage(taskContainer);
-        //     this.pagination(tasks);
-        // } else {
-        //     taskContainer.innerHTML = this.#taskService.templateTask(tasks);
-        // }
-
-        // this.pagination(tasks);
-
-        let pagination = new Pagination(tasks, taskContainer, boardPagination, 5, this.taskService.templateTask);
-        pagination.pagination();
+        let page = new Pagination(tasks, taskContainer, boardPagination, 5, this.taskService.templateTask);
+        page.pagination();
         this.modalOption(); 
     }
 

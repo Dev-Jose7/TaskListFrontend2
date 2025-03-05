@@ -278,9 +278,10 @@ h2{
     background-color: var(--text-color);
 }
 
-.btn__page--move{
-    display: flex;
-    gap: 2vw;
+
+
+.btn__page--move:hover{
+    background-color: var(--text-color);
 }
 
 .btn__option{

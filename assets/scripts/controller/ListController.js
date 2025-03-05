@@ -2,6 +2,7 @@ import ListContainer from "../container/ListContainer.js";
 import TaskContainer from "../container/TaskContainer.js";
 import ListService from "../service/ListService.js";
 import TaskService from "../service/TaskService.js";
+import Pagination from "../UI/Pagination.js";
 import TaskController from "./TaskController.js";
 
 export default class ListController {
@@ -22,13 +23,16 @@ export default class ListController {
     }
 
     getList(){
-        let listContainer = document.getElementById("listContainer");
         let array = this.#listService.getListAll();
+        let listContainer = document.getElementById("listContainer");
+        let boardPaginationList = document.getElementById("boardPaginationList")
         console.log(array)
         ListController.#idList = array[0].id;
 
         this.setIdListTaskContainer();
-        listContainer.innerHTML = this.#listService.templateList(array);
+        let page = new Pagination(array, listContainer, boardPaginationList, 8, this.#listService.templateList)
+        page.pagination();
+        // listContainer.innerHTML = this.#listService.templateList(array);
     }
 
     setIdListTaskContainer(){
