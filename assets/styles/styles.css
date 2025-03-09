@@ -312,6 +312,9 @@ h2{
 } */
 
 .modal__content {
+    display: flex;
+    flex-direction: column;
+    gap: 2vh;
     background-color: var(--primary-color);
     padding: 20px;
     border-radius: 10px;
@@ -349,7 +352,7 @@ h2{
     padding: 2vh;
 }
 
-.modal__footer {
+.modal__footer{
     display: flex;
     justify-content: space-between;
 }

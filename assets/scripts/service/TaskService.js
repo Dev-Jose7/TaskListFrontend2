@@ -68,6 +68,7 @@ export default class TaskService{
         task.description = description;
         task.date = date;
         this.#taskRepository.saveAll();
+        return task;
     }
 
     deleteTask(task){

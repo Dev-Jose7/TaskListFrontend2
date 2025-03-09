@@ -1,5 +1,9 @@
+
+import TaskContainer from "../container/TaskContainer.js";
+
 export default class Pagination{
     static counterId = 0;
+    taskController = TaskContainer.controller(); // Se crea de acuerdo al contexto, atributo que esta por defecto
 
     constructor(data, dataContainer, buttonContainer, sizePage, printData){
         this.id = ++Pagination.counterId;
@@ -16,6 +20,8 @@ export default class Pagination{
         this.lastButtons = false // Indica si el último grupo de botones fueron creados
         this.indexFirst = false; // Indica si el primer boton ha recibido click
         this.indexLast = false; // Indica si el último boton ha recibido click
+         
+        this.idTask = 0;
     }
 
     pagination(){ // Inicia la paginación creando los botones de acuerdo a la cantidad de páginas
@@ -56,6 +62,7 @@ export default class Pagination{
         [...container.childNodes].forEach((button, index) => {
             button.addEventListener("click", (e) => {
                 this.printPage(e.target.textContent);
+                this.taskController.modalOption();
 
                 [...mainPagination.childNodes].forEach(button => {
                     button.classList.remove("btn__page--selected")
@@ -84,6 +91,7 @@ export default class Pagination{
                 }
                 
                 button.classList.add("btn__page--selected")
+                
             });
         });
     }
@@ -300,6 +308,7 @@ export default class Pagination{
             this.indexFirst = true;
             this.shortPagination(2);
             this.printPage(firstButton.textContent)
+            this.taskController.modalOption();
 
             this.indexFirst = false;
         });
@@ -310,8 +319,10 @@ export default class Pagination{
             console.log("en cFLbuttons: ", container.childNodes.length)
             this.shortPagination(container.childNodes.length);
             this.printPage(lastButton.textContent);
+            this.taskController.modalOption();
 
             this.indexLast = false;
         });
+
     }
 }
