@@ -2,11 +2,12 @@ import TaskController from "../controller/TaskController.js";
 
 export default class Modal{
     taskController = new TaskController();
+    static vector = []
 
     constructor(type){
         this.type = type;
         this.title = "";
-        this.message = "";
+
         this.instance = "";
         this.bodyForm = "";
         this.createorUpdateButton = "";
@@ -49,6 +50,9 @@ export default class Modal{
         if(this.type != null){
             this.createFunctionAction();
         }
+
+        this.pushThis(this)
+        console.log(Modal.vector)
     }
 
     templateModal(type){
@@ -140,9 +144,14 @@ export default class Modal{
             document.getElementById("containerModal").remove();
             this.isDoubleAction = false;
             this.functionAction = null;
+            delete this
         } catch (error) {
             
         }
+    }
+
+    pushThis(modal){
+        Modal.vector.push(modal)
     }
 
     createElementTemplate(type){

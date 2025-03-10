@@ -125,7 +125,8 @@ export default class TaskController{
         let modal = new Modal("crear");
         modal.setTitle("Crear tarea");
         modal.setAction(this.addTask);
-        modal.clickToOpen(document.getElementById("modalAddTask"));
+        modal.clickToOpen(document.getElementById("modalAddTask")); 
+        //Una modal se puede abrir directamente con createModal() o usando el método clickToOpen para asignarlo un elemento el cuál al hacer click la abra
     }
 
     modalConfirm(task, message){
