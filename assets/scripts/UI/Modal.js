@@ -14,6 +14,7 @@ export default class Modal{
         this.deleteButtons = "";
         this.instanceTemplate = "";
         this.action = "";
+        this.isDoubleAction = false;
         this.functionAction = null;
     }
 
@@ -46,7 +47,7 @@ export default class Modal{
         this.modalClose();
         
         if(this.type != null){
-            this.takeAction();
+            this.createFunctionAction();
         }
     }
 
@@ -86,35 +87,16 @@ export default class Modal{
 
     clickToOpen(element, getInstance){
         element.addEventListener("click", async () => {
-            if(getInstance){
-                this.instance = await this.taskController.getTaskByClick();
-                console.log(this.instance)
-            }
-
-            // Implementan la función functionAction de acuerdo al elemento clickado, es decir, cuando hayan dos opciones 
-            if(element.id == "updateModalOption" || element.id == "deleteModalOption"){
-                this.functionAction = () => {
-                    this.deleteModal();
-                    element.id == "updateModalOption" ? this.taskController.modalUpdate(this.instance) : 
-                    element.id == "deleteModalOption" ? this.taskController.modalDelete(this.instance) : undefined
-                }
-            }
-
-            if(element.id == "deleteModal" || element.id == "exitModal"){
-                this.functionAction = () => {
-                    this.action(this.instance);
-                    this.deleteModal();
-                    element.id == "deleteModal" ? this.taskController.modalConfirm(this.instance, "¡Tarea eliminada con exito!") : 
-                    element.id == "exitModal" ? this.deleteModal() : undefined;
-                }
-            }
-
+            getInstance ? this.instance = await this.taskController.getTaskByClick() : undefined
+            this.isDoubleAction ? this.doubleFunctionAction(element) : undefined
             this.functionAction != null ? this.functionAction() : this.createModal();
         });
     }
 
-    takeAction(){
+    createFunctionAction(){
+        // Se registra clickToOpen debido a que invocará la functionAction establecido aquí 
         if(this.type == "crear" || this.type == "actualizar"){
+            this.isDoubleAction = false;
             this.clickToOpen(document.getElementById(this.type == "crear" ? "addModal" : this.type == "actualizar" ? "updateModal" : undefined))
             this.functionAction = () => {
                 if(this.type == "crear" || this.type == "actualizar"){
@@ -127,18 +109,37 @@ export default class Modal{
         }
 
         if(this.type == "opciones" || this.type == "eliminar"){
+            this.isDoubleAction = true;
             this.clickToOpen(document.getElementById(this.type == "opciones" ? "updateModalOption" : this.type == "eliminar" ? "deleteModal" : undefined));
             this.clickToOpen(document.getElementById(this.type == "opciones" ? "deleteModalOption" : this.type == "eliminar" ? "exitModal" : undefined));
-        
-            // functionAction es implementada en clickToOpen debido a que estos dos tipos de modal manejarán dos funciones
         }
-        
+    }
+
+    doubleFunctionAction(element){
+        // Implementan la función functionAction de acuerdo al elemento clickado, es decir, cuando hayan dos opciones 
+        if(element.id == "updateModalOption" || element.id == "deleteModalOption"){
+            this.functionAction = () => {
+                this.deleteModal();
+                element.id == "updateModalOption" ? this.taskController.modalUpdate(this.instance) : 
+                element.id == "deleteModalOption" ? this.taskController.modalDelete(this.instance) : undefined
+            }
+        }
+
+        if(element.id == "deleteModal" || element.id == "exitModal"){
+            this.functionAction = () => {
+                this.action(this.instance);
+                this.deleteModal();
+                element.id == "deleteModal" ? this.taskController.modalConfirm(this.instance, "¡Tarea eliminada con exito!") : 
+                element.id == "exitModal" ? this.deleteModal() : undefined;
+            }
+        }
     }
 
     deleteModal(){
         try {
             document.getElementById("containerModal").remove();
-            this.functionAction = null; 
+            this.isDoubleAction = false;
+            this.functionAction = null;
         } catch (error) {
             
         }
