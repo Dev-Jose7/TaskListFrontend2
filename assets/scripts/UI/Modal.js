@@ -1,13 +1,10 @@
-import TaskController from "../controller/TaskController.js";
+import TaskContainer from "../container/TaskContainer.js";
 
 export default class Modal{
-    taskController = new TaskController();
-    static vector = []
+    taskController = TaskContainer.controller();
 
-    constructor(type){
-        this.type = type;
+    constructor(crud = null){
         this.title = "";
-
         this.instance = "";
         this.bodyForm = "";
         this.createorUpdateButton = "";
@@ -16,7 +13,20 @@ export default class Modal{
         this.instanceTemplate = "";
         this.action = "";
         this.isDoubleAction = false;
-        this.functionAction = null;
+        if(crud){
+            this.crud = crud;
+            this.type = "";
+            this.modalAdd = null;
+            this.modalOption = null;
+            this.modalUpdate = null;
+            this.modalDelete = null;
+            this.modalConfirm = null;
+            this.modalsDefault();
+        }
+    }
+
+    setType(type){
+        this.type = type;
     }
 
     setTitle(title){
@@ -31,10 +41,31 @@ export default class Modal{
         this.instance = instance;
     }
 
-    setAction(action){
-        this.action = action;
+    setAction(callback){
+        this.action = callback;
     }
 
+    setModalAdd(callback){
+        this.modalAdd = callback;
+    }
+
+    setModalOption(callback){
+        this.modalOption = callback;
+    }
+
+    setModalUpdate(callback){
+        this.modalUpdate = callback;
+    }
+
+    setModalDelete(callback){
+        this.modalDelete = callback;
+    }
+
+    setModalConfirm(callback){
+        this.modalConfirm = callback;
+    }
+
+    // Segunda función
     createModal(){ // Crea la modal en base a la platilla de los elementos especificados
         // Se crea elemento base de la modal
         let body = document.querySelector("body")
@@ -46,13 +77,7 @@ export default class Modal{
         body.appendChild(containerModal);
         // Se invoca función para poder cerrar (eliminar) la modal cuando se haga clic en la x
         this.modalClose();
-        
-        if(this.type != null){
-            this.createFunctionAction();
-        }
 
-        this.pushThis(this)
-        console.log(Modal.vector)
     }
 
     templateModal(type){
@@ -89,69 +114,79 @@ export default class Modal{
         })
     }
 
-    clickToOpen(element, getInstance){
+    clickToOpen(element, getInstance){ // Primera función
         element.addEventListener("click", async () => {
             getInstance ? this.instance = await this.taskController.getTaskByClick() : undefined
-            this.isDoubleAction ? this.doubleFunctionAction(element) : undefined
-            this.functionAction != null ? this.functionAction() : this.createModal();
+            
+            this.crud ? this.actionCrud(element) : undefined
+
+            if(!this.crud){
+                this.createModal(); //Una modal se puede abrir directamente con createModal() o usando el método clickToOpen para asignarlo a un elemento el cuál la creé al hacer click
+                this.action();
+            }
         });
     }
 
-    createFunctionAction(){
-        // Se registra clickToOpen debido a que invocará la functionAction establecido aquí 
-        if(this.type == "crear" || this.type == "actualizar"){
-            this.isDoubleAction = false;
-            this.clickToOpen(document.getElementById(this.type == "crear" ? "addModal" : this.type == "actualizar" ? "updateModal" : undefined))
-            this.functionAction = () => {
-                if(this.type == "crear" || this.type == "actualizar"){
-                    let instance = this.action(this.type == "actualizar" ? this.instance : undefined);
-                    this.deleteModal();
-                    this.taskController.modalConfirm(instance, this.type == "crear" ? "¡Tarea creada con exito!" : "¡Tarea actualizada con exito!");
-                
-                }
-            }
-        }
-
-        if(this.type == "opciones" || this.type == "eliminar"){
-            this.isDoubleAction = true;
-            this.clickToOpen(document.getElementById(this.type == "opciones" ? "updateModalOption" : this.type == "eliminar" ? "deleteModal" : undefined));
-            this.clickToOpen(document.getElementById(this.type == "opciones" ? "deleteModalOption" : this.type == "eliminar" ? "exitModal" : undefined));
-        }
+    // Escanea los elementos principales los cuales al hacer click mostrarán una modal
+    scanElement(){ // Esta clase debe ser modificada de acuerdo al contexto de la aplicaciones
+        this.clickToOpen(document.getElementById("modalAddButton")); // Creará una modal de tipo crear al hacer click en el botón con id: modalAddButton
+        [...document.querySelectorAll(".editTask")].forEach(btn => { // Creará modales de tipo opciones a todas las instancias impresas al hacer click en el botón con clase: editTask
+            this.clickToOpen(btn, true);
+        });
     }
 
-    doubleFunctionAction(element){
-        // Implementan la función functionAction de acuerdo al elemento clickado, es decir, cuando hayan dos opciones 
-        if(element.id == "updateModalOption" || element.id == "deleteModalOption"){
-            this.functionAction = () => {
-                this.deleteModal();
-                element.id == "updateModalOption" ? this.taskController.modalUpdate(this.instance) : 
-                element.id == "deleteModalOption" ? this.taskController.modalDelete(this.instance) : undefined
-            }
+    // Establece las acciones que debe de realizar cada uno de los boton de cada tipo de modal
+    actionCrud(element){
+        if(element.id == "modalAddButton"){ // Es el boton que abre la modal para crear ej (+ Tarea)
+            this.deleteModal();
+            this.modalAdd();
         }
 
-        if(element.id == "deleteModal" || element.id == "exitModal"){
-            this.functionAction = () => {
-                this.action(this.instance);
-                this.deleteModal();
-                element.id == "deleteModal" ? this.taskController.modalConfirm(this.instance, "¡Tarea eliminada con exito!") : 
-                element.id == "exitModal" ? this.deleteModal() : undefined;
-            }
+        if(element.classList.contains("editTask")){ // Es el boton que abre las opciones de la(s) instancias impresas ej botón (...)
+            this.deleteModal();
+            this.modalOption();
+        }
+
+        if(element.id == "addModal"){// Es el botón de la modal de tipo crear (boton: Crear)
+            this.instance = this.taskController.addTask();
+            this.deleteModal();
+            this.modalConfirm();
+        }
+
+        if(element.id == "updateModalOption"){ // Es el botón de modificar de la modal de tipo opciones (botones: Modificar - Eliminar)
+            this.deleteModal();
+            this.modalUpdate();
+        }
+
+        if(element.id == "deleteModalOption"){ // Es el botón de eliminar de la modal de tipo opciones (botones: Modificar - Eliminar)
+            this.deleteModal();
+            this.modalDelete();
+        }
+
+        if(element.id == "updateModal"){ // Es el botón de la modal de tipo actualizar (boton: Actualizar)
+            this.instance = this.taskController.updateTask(this.instance);
+            this.deleteModal();
+            this.modalConfirm();
+        }
+
+        if(element.id == "deleteModal"){ // Es el botón Si de la modal de tipo eliminar (botones: Si - No)
+            this.taskController.deleteTask(this.instance);
+            this.deleteModal();
+            this.modalConfirm();
+        }    
+
+        if(element.id == "exitModal"){ // Es el botón No de la modal de tipo eliminar (botones: Si - No)
+            this.deleteModal();
+            this.modalOption();
         }
     }
 
     deleteModal(){
         try {
             document.getElementById("containerModal").remove();
-            this.isDoubleAction = false;
-            this.functionAction = null;
-            delete this
         } catch (error) {
             
         }
-    }
-
-    pushThis(modal){
-        Modal.vector.push(modal)
     }
 
     createElementTemplate(type){
@@ -194,5 +229,53 @@ export default class Modal{
             <i class="fas fa-times"></i>
             No
         </button>`
+    }
+
+    modalsDefault(){
+        this.modalAdd = () => {
+            this.setType("crear"); // Define un tipo a la modal
+            this.setTitle("Crear"); // Define un titulo a la modal se modifica de acuerdo al contexto de la aplicación
+            this.createModal(); // Se crea la modal, las modales crud serán creadas con el metodo actionCrud y este a su vez será invocado por el método clickToOpen
+            this.clickToOpen(document.getElementById("addModal")); // Se establece click al boton de esta modal, es decir a la que va a crear
+        }
+
+        this.modalOption = () => {
+            this.setType("opciones");
+            this.setTitle("Opciones");
+            this.createModal();
+            this.clickToOpen(document.getElementById("updateModalOption"))
+            this.clickToOpen(document.getElementById("deleteModalOption"))
+        }
+
+        this.modalConfirm = () => {
+            this.setType("confirmar");
+            this.setTitle("Confirmación");
+            this.createModal();
+        }
+
+        this.modalUpdate = () => {
+            this.setType("actualizar");
+            this.setTitle("Actualizar");
+            this.createModal();
+            let inputName = document.getElementById("inputNameModal");
+            let inputDate = document.getElementById("inputDateModal");
+            let inputDescription = document.getElementById("inputDescriptionModal");
+            inputName.value = this.instance.name;
+            inputDate.value = this.instance.dateFormat;
+            inputDescription.value = this.instance.description;
+            this.clickToOpen(document.getElementById("updateModal"))
+        }
+
+        this.modalDelete = () => {
+            this.setType("eliminar");
+            this.setTitle("Eliminar");
+            this.createModal();
+            this.clickToOpen(document.getElementById("deleteModal"))
+            this.clickToOpen(document.getElementById("exitModal"))
+        }
+    }
+
+    initModal(){
+        this.modalAdd();
     }
 }

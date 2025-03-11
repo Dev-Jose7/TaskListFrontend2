@@ -33,7 +33,8 @@ export default class TaskController{
         let page = new Pagination(tasks, taskContainer, boardPagination, 5, this.taskService.templateTask);
         page.pagination();
 
-        this.modalOption(); 
+        let modal = new Modal(true);
+        modal.scanElement();
     }
 
     printTask(){
@@ -113,51 +114,51 @@ export default class TaskController{
     }
 
     // Funciones que crean modales y serán invocadas en los métodos de la clase Modal, de acuerdo a donde se necesite
-    modalOption(){
-        let modal = new Modal("opciones");
-        modal.setTitle("Opciones tarea");
-        [...document.querySelectorAll(".btn__list--edit")].forEach( btn => {
-            modal.clickToOpen(btn, true);
-        })
-    }
+    // modalOption(){
+    //     let modal = new Modal("opciones");
+    //     modal.setTitle("Opciones tarea");
+    //     [...document.querySelectorAll(".btn__list--edit")].forEach( btn => {
+    //         modal.clickToOpen(btn, true);
+    //     })
+    // }
 
-    modalAdd(){
-        let modal = new Modal("crear");
-        modal.setTitle("Crear tarea");
-        modal.setAction(this.addTask);
-        modal.clickToOpen(document.getElementById("modalAddTask")); 
-        //Una modal se puede abrir directamente con createModal() o usando el método clickToOpen para asignarlo un elemento el cuál al hacer click la abra
-    }
+    // modalAdd(){
+    //     let modal = new Modal("crear");
+    //     modal.setTitle("Crear tarea");
+    //     modal.setAction(this.addTask);
+    //     modal.clickToOpen(document.getElementById("modalAddTask")); 
+    //     //Una modal se puede abrir directamente con createModal() o usando el método clickToOpen para asignarlo un elemento el cuál al hacer click la abra
+    // }
 
-    modalConfirm(task, message){
-        let modal = new Modal("confirmar");
-        modal.setTitle(message);
-        modal.setInstance(task);
-        modal.createModal();
-    }
+    // modalConfirm(task, message){
+    //     let modal = new Modal("confirmar");
+    //     modal.setTitle(message);
+    //     modal.setInstance(task);
+    //     modal.createModal();
+    // }
 
-    modalUpdate(task){
-        let modal = new Modal("actualizar");
-        modal.setTitle("Actualizar tarea");
-        modal.setInstance(task);
-        modal.setAction(this.updateTask);
-        modal.createModal();
-        console.log(modal)
-        let inputName = document.getElementById("inputNameModal");
-        let inputDate = document.getElementById("inputDateModal");
-        let inputDescription = document.getElementById("inputDescriptionModal");
-        inputName.value = task.name;
-        inputDate.value = task.dateFormat;
-        inputDescription.value = task.description;
-    }
+    // modalUpdate(task){
+    //     let modal = new Modal("actualizar");
+    //     modal.setTitle("Actualizar tarea");
+    //     modal.setInstance(task);
+    //     modal.setAction(this.updateTask);
+    //     modal.createModal();
+    //     console.log(modal)
+    //     let inputName = document.getElementById("inputNameModal");
+    //     let inputDate = document.getElementById("inputDateModal");
+    //     let inputDescription = document.getElementById("inputDescriptionModal");
+    //     inputName.value = task.name;
+    //     inputDate.value = task.dateFormat;
+    //     inputDescription.value = task.description;
+    // }
 
-    modalDelete(task){
-        let modal = new Modal("eliminar");
-        modal.setTitle("Eliminar tarea");
-        modal.setInstance(task);
-        modal.setAction(this.deleteTask);
-        modal.createModal();
-    }
+    // modalDelete(task){
+    //     let modal = new Modal("eliminar");
+    //     modal.setTitle("Eliminar tarea");
+    //     modal.setInstance(task);
+    //     modal.setAction(this.deleteTask);
+    //     modal.createModal();
+    // }
 
     setDate(filter){
         let boardDate = document.querySelector(".board__date");
@@ -186,7 +187,6 @@ export default class TaskController{
     }
 
     init(){
-        this.modalAdd();
         this.printTask();
         this.getTaskByClick();
     }
