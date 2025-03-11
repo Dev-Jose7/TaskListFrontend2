@@ -4,6 +4,7 @@ import TaskContainer from "../container/TaskContainer.js";
 export default class Pagination{
     static counterId = 0;
     taskController = TaskContainer.controller(); // Se crea de acuerdo al contexto, atributo que esta por defecto
+    
 
     constructor(data, dataContainer, buttonContainer, sizePage, printData){
         this.id = ++Pagination.counterId;
@@ -62,7 +63,7 @@ export default class Pagination{
         [...container.childNodes].forEach((button, index) => {
             button.addEventListener("click", (e) => {
                 this.printPage(e.target.textContent);
-                this.taskController.modalOption();
+                this.taskController.modal();
 
                 [...mainPagination.childNodes].forEach(button => {
                     button.classList.remove("btn__page--selected")
@@ -177,7 +178,6 @@ export default class Pagination{
 
         this.dataContainer.innerHTML = ""
         this.dataContainer.innerHTML = this.printData(pageData)
-        // this.modalOption(); 
     }
 
     // Se encarga de abreviar la páginación
@@ -308,7 +308,7 @@ export default class Pagination{
             this.indexFirst = true;
             this.shortPagination(2);
             this.printPage(firstButton.textContent)
-            this.taskController.modalOption();
+            this.taskController.modal();
 
             this.indexFirst = false;
         });
@@ -319,7 +319,7 @@ export default class Pagination{
             console.log("en cFLbuttons: ", container.childNodes.length)
             this.shortPagination(container.childNodes.length);
             this.printPage(lastButton.textContent);
-            this.taskController.modalOption();
+            this.taskController.modal();
 
             this.indexLast = false;
         });

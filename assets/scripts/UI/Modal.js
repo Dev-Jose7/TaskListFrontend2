@@ -5,17 +5,19 @@ export default class Modal{
 
     constructor(crud = null){
         this.title = "";
-        this.instance = "";
-        this.bodyForm = "";
-        this.createorUpdateButton = "";
-        this.optionButtons = "";
-        this.deleteButtons = "";
-        this.instanceTemplate = "";
+        this.message = "";
+        this.footer = "";
         this.action = "";
-        this.isDoubleAction = false;
+        
         if(crud){
             this.crud = crud;
             this.type = "";
+            this.instance = "";
+            this.bodyForm = "";
+            this.createorUpdateButton = "";
+            this.optionButtons = "";
+            this.deleteButtons = "";
+            this.instanceTemplate = "";
             this.modalAdd = null;
             this.modalOption = null;
             this.modalUpdate = null;
@@ -35,6 +37,10 @@ export default class Modal{
 
     setMessage(message){
         this.message = message;
+    }
+
+    setFooter(footer){
+        this.footer = footer;
     }
 
     setInstance(instance){
@@ -70,9 +76,10 @@ export default class Modal{
         // Se crea elemento base de la modal
         let body = document.querySelector("body")
         let containerModal = document.createElement("DIV");
+        document.getElementById("containerModal") ? this.deleteModal() : null
         containerModal.id = "containerModal";
-        // Se crean las plantillas de los elementos que conformarán el cuerpo de la modal y se crea la modal.
-        this.createElementTemplate(this.type);
+        // Se crean las plantillas de los elementos que conformarán el cuerpo de las modales y modal CRUD y se crea la modal.
+        this.crud ? this.createElementTemplate(this.type) : null
         containerModal.innerHTML = this.templateModal(this.type);
         body.appendChild(containerModal);
         // Se invoca función para poder cerrar (eliminar) la modal cuando se haga clic en la x
@@ -84,11 +91,11 @@ export default class Modal{
         let elemento = `
         <div class="modal__container modal__container--form" id="modal">
             <div class="modal__content">
+                <button class="btn-close">
+                    <i class="fas fa-times"></i> 
+                </button>
                 <div class="modal__header">
                     <h3>${this.title}</h3>
-                    <button class="btn-close">
-                        <i class="fas fa-times"></i> 
-                    </button>
                 </div>
                 <div class="modal__body">
                     ${type == "confirmar" || type == "opciones" || type == "eliminar" ? this.instanceTemplate : 
@@ -99,7 +106,8 @@ export default class Modal{
                 <div class="modal__footer ${type != "opciones" && type != "eliminar" ? "modal__footer--one" : ""}">
                     ${type == "crear" || type == "actualizar" ? this.createorUpdateButton : 
                         type == "opciones" ? this.optionButtons : 
-                        type == "eliminar" ? this.deleteButtons : ""}
+                        type == "eliminar" ? this.deleteButtons : 
+                        type == null ? this.footer : null}
                 </div>
             </div>
         </div>`
@@ -122,17 +130,14 @@ export default class Modal{
 
             if(!this.crud){
                 this.createModal(); //Una modal se puede abrir directamente con createModal() o usando el método clickToOpen para asignarlo a un elemento el cuál la creé al hacer click
-                this.action();
+                this.action(element);
             }
         });
     }
 
     // Escanea los elementos principales los cuales al hacer click mostrarán una modal
-    scanElement(){ // Esta clase debe ser modificada de acuerdo al contexto de la aplicaciones
-        this.clickToOpen(document.getElementById("modalAddButton")); // Creará una modal de tipo crear al hacer click en el botón con id: modalAddButton
-        [...document.querySelectorAll(".editTask")].forEach(btn => { // Creará modales de tipo opciones a todas las instancias impresas al hacer click en el botón con clase: editTask
-            this.clickToOpen(btn, true);
-        });
+    scanElement(callback){ // El callback que recibe este método es proporcionado por el script que lo necesite, por ende es modificado de acuerdo al contexto de la aplicación.
+        callback();
     }
 
     // Establece las acciones que debe de realizar cada uno de los boton de cada tipo de modal
@@ -231,6 +236,7 @@ export default class Modal{
         </button>`
     }
 
+    // Crea las modales CRUD predeterminadas
     modalsDefault(){
         this.modalAdd = () => {
             this.setType("crear"); // Define un tipo a la modal
@@ -275,7 +281,28 @@ export default class Modal{
         }
     }
 
-    initModal(){
-        this.modalAdd();
+    static modalTest(){
+        let modal = new Modal();
+        let message = `
+        <div class="card">
+            <div class="card-content">
+            <h3 class="card-title">Cámara Digital XYZ</h3>
+            <p class="card-description">Captura tus momentos con esta cámara digital de alta resolución. Ideal para fotógrafos principiantes y avanzados.</p>
+            <p class="card-price">$499.99</p>
+            </div>
+        </div>`
+        let footer = `<button class="add-to-cart-btn btn btn__list">Añadir al carrito</button>`
+
+        modal.setTitle("Detalles del producto")
+        modal.setMessage(message);
+        modal.setFooter(footer)
+        modal.createModal();
+        modal.clickToOpen(document.querySelector(".add-to-cart-btn"))
+        modal.setAction((element) => {
+            let modalConfirm = new Modal()
+            modalConfirm.setTitle("¡Hecho!")
+            modalConfirm.setMessage("El pedido ha sido añadido al carrito")
+            modalConfirm.createModal();
+        })
     }
 }
