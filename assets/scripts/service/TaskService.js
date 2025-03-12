@@ -88,7 +88,7 @@ export default class TaskService{
                         <h4>${task.name}</h4>
                         <p>${task.description}</p>
                     </div>
-                    <button class="btn btn__list--edit editTask">···</button>
+                    <button class="btn btn__list--edit modalOptionButton">···</button>
                 </div>`
                 
             }   

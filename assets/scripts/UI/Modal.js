@@ -107,7 +107,7 @@ export default class Modal{
                     ${type == "crear" || type == "actualizar" ? this.createorUpdateButton : 
                         type == "opciones" ? this.optionButtons : 
                         type == "eliminar" ? this.deleteButtons : 
-                        type == null ? this.footer : null}
+                        type == null ? this.footer : ""}
                 </div>
             </div>
         </div>`
@@ -143,45 +143,37 @@ export default class Modal{
     // Establece las acciones que debe de realizar cada uno de los boton de cada tipo de modal
     actionCrud(element){
         if(element.id == "modalAddButton"){ // Es el boton que abre la modal para crear ej (+ Tarea)
-            this.deleteModal();
             this.modalAdd();
         }
 
-        if(element.classList.contains("editTask")){ // Es el boton que abre las opciones de la(s) instancias impresas ej botón (...)
-            this.deleteModal();
+        if(element.classList.contains("modalOptionButton")){ // Es el boton que abre las opciones de la(s) instancias impresas ej botón (...)
             this.modalOption();
+        }
+
+        if(element.id == "updateModalButton"){ // Es el botón de modificar de la modal de tipo opciones (botones: Modificar - Eliminar)
+            this.modalUpdate();
+        }
+
+        if(element.id == "deleteModalButton"){ // Es el botón de eliminar de la modal de tipo opciones (botones: Modificar - Eliminar)
+            this.modalDelete();
         }
 
         if(element.id == "addModal"){// Es el botón de la modal de tipo crear (boton: Crear)
             this.instance = this.taskController.addTask();
-            this.deleteModal();
             this.modalConfirm();
-        }
-
-        if(element.id == "updateModalOption"){ // Es el botón de modificar de la modal de tipo opciones (botones: Modificar - Eliminar)
-            this.deleteModal();
-            this.modalUpdate();
-        }
-
-        if(element.id == "deleteModalOption"){ // Es el botón de eliminar de la modal de tipo opciones (botones: Modificar - Eliminar)
-            this.deleteModal();
-            this.modalDelete();
         }
 
         if(element.id == "updateModal"){ // Es el botón de la modal de tipo actualizar (boton: Actualizar)
             this.instance = this.taskController.updateTask(this.instance);
-            this.deleteModal();
             this.modalConfirm();
         }
 
         if(element.id == "deleteModal"){ // Es el botón Si de la modal de tipo eliminar (botones: Si - No)
             this.taskController.deleteTask(this.instance);
-            this.deleteModal();
             this.modalConfirm();
         }    
 
         if(element.id == "exitModal"){ // Es el botón No de la modal de tipo eliminar (botones: Si - No)
-            this.deleteModal();
             this.modalOption();
         }
     }
@@ -216,11 +208,11 @@ export default class Modal{
         </button>`
 
         this.optionButtons = 
-        `<button class="btn btn__option" id="updateModalOption">
+        `<button class="btn btn__option" id="updateModalButton">
             <i class="fas fa-pen-alt"></i>
             Modificar
         </button>
-        <button class="btn btn__option" id="deleteModalOption">
+        <button class="btn btn__option" id="deleteModalButton">
             <i class="fas fa-trash-alt"></i>
             Eliminar
         </button>`
@@ -249,8 +241,8 @@ export default class Modal{
             this.setType("opciones");
             this.setTitle("Opciones");
             this.createModal();
-            this.clickToOpen(document.getElementById("updateModalOption"))
-            this.clickToOpen(document.getElementById("deleteModalOption"))
+            this.clickToOpen(document.getElementById("updateModalButton"))
+            this.clickToOpen(document.getElementById("deleteModalButton"))
         }
 
         this.modalConfirm = () => {

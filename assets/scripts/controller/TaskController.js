@@ -116,7 +116,7 @@ export default class TaskController{
         let modal = new Modal(true);
         modal.scanElement(() => { // Los elementos principales de taskList son el boton para crear una tarea [+ Tarea] y los botones de las opciones de las instancias impresas
             modal.clickToOpen(document.getElementById("modalAddButton")); // Creará una modal de tipo crear al hacer click en el botón con id: modalAddButton
-            [...document.querySelectorAll(".editTask")].forEach(btn => { // Creará modales de tipo opciones a todas las instancias impresas al hacer click en el botón con clase: editTask
+            [...document.querySelectorAll(".modalOptionButton")].forEach(btn => { // Creará modales de tipo opciones a todas las instancias impresas al hacer click en el botón con clase: editTask
                 modal.clickToOpen(btn, true);
             });
         });
