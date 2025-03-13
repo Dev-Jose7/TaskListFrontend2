@@ -47,7 +47,6 @@ export default class ListRepository{
     restoreInstance(){
         this.#listArray = []; // Se limpia el contenedor 
         let array = JSON.parse(sessionStorage.getItem("listDB"));
-
         for (const list of array) {
             if(!this.findById(list.id)){
                 let object = new List(list.name); // Se instancian usando los objetos almacenados en sessionStorage

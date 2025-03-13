@@ -26,7 +26,6 @@ export default class TaskRepository{
                 status: task.status
             }
         ))));
-        console.log(this.#taskArray)
     }
 
     findAll(){

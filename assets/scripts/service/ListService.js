@@ -10,10 +10,10 @@ export default class ListService {
     createList(name){
         let list = new List(name);
         this.#listRepository.save(list);
+        return list;
     }
 
     getListAll(){
-        console.log(this.#listRepository.findAll())
         return this.#listRepository.findAll();
     }
 
@@ -21,9 +21,11 @@ export default class ListService {
         return this.#listRepository.findById(id);
     }
 
-    updateList(list, name){
+    updateList(id, name){
+        let list = this.#listRepository.findById(id)
         list.name = name;
-        this.#listRepository.saveAll();  // Guardamos todas las listas después de actualizar
+        this.#listRepository.saveAll(); // Guardamos todas las listas después de actualizar
+        return list;
     }
 
     deleteList(list){
@@ -37,7 +39,7 @@ export default class ListService {
             elemento += `
                 <div class="board__list ${i == 0 ? "board__list--selected" : ""}" data-id=${array[i].id}>
                     <h4>${array[i].name}</h4>
-                    <button class="btn btn__list--edit" title="Opciones">···</button>
+                    <button class="btn btn__list--edit modalOptionButton" title="Opciones" data-type="list">···</button>
                 </div>`
             
         }

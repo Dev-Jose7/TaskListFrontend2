@@ -83,79 +83,17 @@ export default class TaskService{
             for (const task of array) {
                 elemento += `
                 <div class="board__task ${task.status ? "board__task--selected" : ""}" data-id=${task.id} data-idList=${task.idList}>
-                    <input type="checkbox" class="board__task-check" ${task.status ? "checked" : ""}>
+                    <input type="checkbox" class="board__task-check" name="checkStatus" ${task.status ? "checked" : ""}>
                     <div class="board__task-text">
                         <h4>${task.name}</h4>
                         <p>${task.description}</p>
                     </div>
-                    <button class="btn btn__list--edit modalOptionButton">···</button>
+                    <button class="btn btn__list--edit modalOptionButton" data-type="task">···</button>
                 </div>`
                 
             }   
         }
 
         return elemento
-    }
-
-    templateModal(type, task){
-        let elemento = `
-            <div class="modal__container modal__container--form" id="modalTask">
-                <div class="modal__content">
-                    <div class="modal__header">
-                        <h3>${type} tarea</h3>
-                        <button class="btn-close">
-                            <i class="fas fa-times"></i> <!-- Icono de la X -->
-                        </button>
-                    </div>
-                    <div class="modal__body">
-                        ${type == "Opciones" || type == "Eliminar" || type == "Confirmar" ? `
-                        <div class="board__task">
-                            <div class="board__task-text board__task-text--modal">
-                                <h4>${task.name}</h4>
-                                <p>${task.dateFormat}</p>
-                                <p>${task.description}</p>
-                            </div>
-                        </div>`
-                            :
-                        `<div id="modalForm">
-                            <input type="text" class="form-input" id="inputNameTask" placeholder="Nombre" value="${type == "Actualizar" ? task.name : ""}" required>
-                            <input type="date" class="form-input" id="inputDateTask" placeholder="Fecha" value="${type == "Actualizar" ? task.dateFormat : ""}" required>
-                            <textarea class="form-input" id="inputDescriptionTask" placeholder="Mensaje (Opcional)" rows="4"></textarea>
-                        </div>`}
-                    </div>
-                    
-                    <div class="modal__footer ${type == "Crear" || type == "Actualizar" ? "modal__footer--one" : ""}">
-                        ${type == "Opciones" ? `
-                            <button class="btn btn__option" id="updateTask">
-                                <i class="fas fa-pen-alt"></i>
-                                Modificar
-                            </button>
-                            <button class="btn btn__option" id="deleteTask">
-                                <i class="fas fa-trash-alt"></i>
-                                Eliminar
-                            </button>` 
-                                : 
-                        type == "Eliminar" ? `
-                            <button class="btn btn__option" id="deleteTask">
-                                <i class="fas fa-check"></i>
-                                Si
-                            </button>
-                            <button class="btn btn__option" id="keepTask">
-                                <i class="fas fa-times"></i>
-                                No
-                            </button>` 
-                                :
-                        type == "Crear" || type == "Actualizar" ? `
-                            <button class="btn btn__option" type="submit" form="modalForm" id="${type == "Crear" ? "addTask" : "updateTask"}">
-                                <i class="fas fa-plus"></i>
-                                ${type == "Crear" ? "Crear" : "Actualizar"}
-                            </button>` 
-                                : 
-                        ``}
-                    </div>
-                </div>
-            </div>`
-    
-        return elemento;
     }
 }

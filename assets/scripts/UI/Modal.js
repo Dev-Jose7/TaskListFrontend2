@@ -1,13 +1,16 @@
+import ListContainer from "../container/ListContainer.js";
 import TaskContainer from "../container/TaskContainer.js";
 
 export default class Modal{
     taskController = TaskContainer.controller();
+    listController = ListContainer.controller()
 
     constructor(crud = null){
         this.title = "";
         this.message = "";
         this.footer = "";
         this.action = "";
+        this.entity = ""; // Propiedad opcional, se usa si habra varias entidades usando la modal, se utiliza para identificar quien la esta usando
         
         if(crud){
             this.crud = crud;
@@ -122,18 +125,36 @@ export default class Modal{
         })
     }
 
-    clickToOpen(element, getInstance){ // Primera función
-        element.addEventListener("click", async () => {
-            getInstance ? this.instance = await this.taskController.getTaskByClick() : undefined
-            
-            this.crud ? this.actionCrud(element) : undefined
-
-            if(!this.crud){
-                this.createModal(); //Una modal se puede abrir directamente con createModal() o usando el método clickToOpen para asignarlo a un elemento el cuál la creé al hacer click
-                this.action(element);
-            }
-        });
+    clickToOpen(element, getInstance) { 
+        // Verifica si el evento ya fue asignado
+        if (!element.hasClickListener) {
+            element.addEventListener("click", async () => {
+                if(!element.id){
+                    this.entity = element.dataset.type; // PROBLEMA
+                }
+                try {
+                    if(getInstance){
+                        this.entity == "task" ? this.instance = await this.taskController.getTaskByClick() : 
+                        this.entity == "list" ? this.instance = await this.listController.getListByClick() : undefined
+                    }
+                } catch (error) {
+                    
+                }
+                
+                this.crud ? this.actionCrud(element) : undefined;
+    
+                // Si no es CRUD, abre el modal
+                if (!this.crud) {
+                    this.createModal(); // Una modal se puede abrir directamente con createModal() o usando el método clickToOpen para asignarlo a un elemento el cuál la creé al hacer click
+                    this.action(element);
+                }
+            });
+    
+            // Marca el elemento como si ya tiene el evento asignado
+            element.hasClickListener = true; // Esto evita que se agregue el evento múltiples veces
+        }
     }
+    
 
     // Escanea los elementos principales los cuales al hacer click mostrarán una modal
     scanElement(callback){ // El callback que recibe este método es proporcionado por el script que lo necesite, por ende es modificado de acuerdo al contexto de la aplicación.
@@ -142,7 +163,10 @@ export default class Modal{
 
     // Establece las acciones que debe de realizar cada uno de los boton de cada tipo de modal
     actionCrud(element){
-        if(element.id == "modalAddButton"){ // Es el boton que abre la modal para crear ej (+ Tarea)
+        console.log(element.id)
+        console.log(this.entity)
+        console.log(this.instance)
+        if(element.classList.contains("modalAddButton")){ // Es el boton que abre la modal para crear ej (+ Tarea)
             this.modalAdd();
         }
 
@@ -159,17 +183,20 @@ export default class Modal{
         }
 
         if(element.id == "addModal"){// Es el botón de la modal de tipo crear (boton: Crear)
-            this.instance = this.taskController.addTask();
+            this.entity == "task" ? this.instance = this.taskController.addTask() : 
+            this.entity == "list" ? this.instance = this.listController.addList() : undefined
             this.modalConfirm();
         }
 
         if(element.id == "updateModal"){ // Es el botón de la modal de tipo actualizar (boton: Actualizar)
-            this.instance = this.taskController.updateTask(this.instance);
+            this.entity == "task" ? this.instance = this.taskController.updateTask(this.instance) : 
+            this.entity == "list" ? this.instance = this.listController.updateList(this.instance) : undefined
             this.modalConfirm();
         }
 
         if(element.id == "deleteModal"){ // Es el botón Si de la modal de tipo eliminar (botones: Si - No)
-            this.taskController.deleteTask(this.instance);
+            this.entity == "task" ? this.taskController.deleteTask(this.instance) : 
+            this.entity == "list" ? this.listController.deleteList(this.instance) : undefined
             this.modalConfirm();
         }    
 
@@ -190,15 +217,19 @@ export default class Modal{
         this.bodyForm = 
         `<div id="modalForm">
              <input type="text" class="form-input" id="inputNameModal" placeholder="Nombre" value="${type == "Actualizar" ? this.instance.name : ""}" required>
-             <input type="date" class="form-input" id="inputDateModal" placeholder="Fecha" value="${type == "Actualizar" ? this.instance.dateFormat : ""}" required>
-             <textarea class="form-input" id="inputDescriptionModal" placeholder="Mensaje (Opcional)" rows="4"></textarea>
+             ${this.entity == "task" ? 
+                `<input type="date" class="form-input" id="inputDateModal" placeholder="Fecha" value="${type == "Actualizar" ? this.instance.dateFormat : ""}" required>
+                <textarea class="form-input" id="inputDescriptionModal" placeholder="Mensaje (Opcional)" rows="4"></textarea>` : ""
+             }
          </div>`
         
         this.instanceTemplate = 
         `<div class="board__task-text board__task-text--modal">
             <h4>${this.instance.name}</h4>
-            <p>${this.instance.dateFormat}</p>
-            <p>${this.instance.description}</p>
+            ${this.entity == "task" ? 
+                `<p>${this.instance.dateFormat}</p>
+                <p>${this.instance.description}</p>` : ""
+            }
         </div>`
 
         this.createorUpdateButton = 
@@ -256,11 +287,13 @@ export default class Modal{
             this.setTitle("Actualizar");
             this.createModal();
             let inputName = document.getElementById("inputNameModal");
-            let inputDate = document.getElementById("inputDateModal");
-            let inputDescription = document.getElementById("inputDescriptionModal");
             inputName.value = this.instance.name;
-            inputDate.value = this.instance.dateFormat;
-            inputDescription.value = this.instance.description;
+            if(this.entity == "task"){
+                let inputDate = document.getElementById("inputDateModal");
+                let inputDescription = document.getElementById("inputDescriptionModal");
+                inputDate.value = this.instance.dateFormat;
+                inputDescription.value = this.instance.description;
+            }
             this.clickToOpen(document.getElementById("updateModal"))
         }
 
@@ -296,5 +329,19 @@ export default class Modal{
             modalConfirm.setMessage("El pedido ha sido añadido al carrito")
             modalConfirm.createModal();
         })
+    }
+
+    static initModal(){
+        let modal = new Modal(true);
+        modal.scanElement(() => { // Los elementos principales de taskList son el boton para crear una tarea [+ Tarea] y los botones de las opciones de las instancias impresas
+             // Creará una modal de tipo crear al hacer click en el botón con id: modalAddButton
+            [...document.querySelectorAll(".modalAddButton")].forEach(btn => { // Creará modales de tipo opciones a todas las instancias impresas al hacer click en el botón con clase: editTask
+                modal.clickToOpen(btn);
+            });
+            
+            [...document.querySelectorAll(".modalOptionButton")].forEach(btn => { // Creará modales de tipo opciones a todas las instancias impresas al hacer click en el botón con clase: editTask
+                modal.clickToOpen(btn, true);
+            });
+        });
     }
 }

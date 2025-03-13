@@ -25,7 +25,6 @@ export default class TaskController{
         let idList = document.getElementById("taskContainer").dataset.idList;
         let date = this.#taskService.getDate();
         let tasks = this.#taskService.getTasksByDate(date, filter, this.#taskService.getTaskByList(idList));
-        console.log(tasks);
 
         taskContainer.innerHTML = "";
         boardPagination.innerHTML = "";
@@ -33,7 +32,8 @@ export default class TaskController{
         let page = new Pagination(tasks, taskContainer, boardPagination, 5, this.taskService.templateTask);
         page.pagination();
 
-        this.modal();
+        // this.modal();
+        Modal.initModal();
     }
 
     printTask(){
@@ -49,7 +49,6 @@ export default class TaskController{
                 controller.setDate(e.target.textContent);
                 controller.getTask(e.target.textContent);
                 controller.checkTask();
-                // controller.modalOption();
             });
         });
         
@@ -65,7 +64,6 @@ export default class TaskController{
             [...tasksPrints].forEach(task => {
                 task.addEventListener("click", () => {
                     let id = task.dataset.id;
-                    console.log(TaskContainer.service().getTaskById(id))
                     resolve(TaskContainer.service().getTaskById(id))
                 });
             });
@@ -93,7 +91,6 @@ export default class TaskController{
     }
 
     updateTask(task){
-        console.log(task)
         let inputName = document.getElementById("inputNameModal");
         let inputDate = document.getElementById("inputDateModal");
         let inputDescription = document.getElementById("inputDescriptionModal");
@@ -115,7 +112,11 @@ export default class TaskController{
     modal(){
         let modal = new Modal(true);
         modal.scanElement(() => { // Los elementos principales de taskList son el boton para crear una tarea [+ Tarea] y los botones de las opciones de las instancias impresas
-            modal.clickToOpen(document.getElementById("modalAddButton")); // Creará una modal de tipo crear al hacer click en el botón con id: modalAddButton
+             // Creará una modal de tipo crear al hacer click en el botón con id: modalAddButton
+            [...document.querySelectorAll(".modalAddButton")].forEach(btn => { // Creará modales de tipo opciones a todas las instancias impresas al hacer click en el botón con clase: editTask
+                modal.clickToOpen(btn);
+            });
+            
             [...document.querySelectorAll(".modalOptionButton")].forEach(btn => { // Creará modales de tipo opciones a todas las instancias impresas al hacer click en el botón con clase: editTask
                 modal.clickToOpen(btn, true);
             });
@@ -127,8 +128,8 @@ export default class TaskController{
         let date = this.#taskService.getDate();
         let dateString = new Date().toDateString().split(" ")
 
-        console.log(date);
-        console.log(dateString)
+        // console.log(date);
+        // console.log(dateString)
 
         if(filter == "Día"){
             boardDate.querySelector("h3").textContent = dateString[0]

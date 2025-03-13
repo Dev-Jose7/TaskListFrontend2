@@ -1,10 +1,12 @@
 
+import ListContainer from "../container/ListContainer.js";
 import TaskContainer from "../container/TaskContainer.js";
+import Modal from "./Modal.js";
 
 export default class Pagination{
     static counterId = 0;
     taskController = TaskContainer.controller(); // Se crea de acuerdo al contexto, atributo que esta por defecto
-    
+    listController = ListContainer.controller();
 
     constructor(data, dataContainer, buttonContainer, sizePage, printData){
         this.id = ++Pagination.counterId;
@@ -47,7 +49,6 @@ export default class Pagination{
         } catch (error) {
             
         }
-        
     }
 
     createButtons(container){ // Se encarga de crear los botones de acuerdo a la cantidad de paginas calculados por el método pagination
@@ -63,7 +64,9 @@ export default class Pagination{
         [...container.childNodes].forEach((button, index) => {
             button.addEventListener("click", (e) => {
                 this.printPage(e.target.textContent);
-                this.taskController.modal();
+                Modal.initModal();
+                this.listController.selectList();
+                this.taskController.checkTask();
 
                 [...mainPagination.childNodes].forEach(button => {
                     button.classList.remove("btn__page--selected")
@@ -177,7 +180,7 @@ export default class Pagination{
         }
 
         this.dataContainer.innerHTML = ""
-        this.dataContainer.innerHTML = this.printData(pageData)
+        this.dataContainer.innerHTML = this.printData(pageData);
     }
 
     // Se encarga de abreviar la páginación
@@ -200,7 +203,6 @@ export default class Pagination{
 
         // Si se hace click en el ultimo boton ej (11) creará el primer boton (1)
         if(this.indexLast){ 
-            console.log(container)
             if(!document.getElementById(`containerFirstButton${this.id}`)){
                 this.createFirstLastButtons(container, "first");
             }
@@ -250,7 +252,6 @@ export default class Pagination{
         // console.log(" ");
 
         for (let i = 0; i < index; i++) {
-            console.log("En el for: ", container.childNodes[i + (indexButton)])
             if(container.childNodes[i + (indexButton)] != null){ //Extraerá todos los botones del container de acuerdo al indice obtenido (número botón menos 3 para que el boton seleccionado se ubique a la mitad)
                 buttonPage.push(container.childNodes[i + (indexButton)])
             }
@@ -294,7 +295,6 @@ export default class Pagination{
             let dotsLast = document.createElement("P");
             lastButton.textContent = container.childNodes.length;
 
-            console.log(container.childNodes.length)
             containerLastButton.id = `containerLastButton${this.id}`
             dotsLast.textContent = "...";
             lastButton.classList.add("btn", "btn__page");
@@ -307,8 +307,9 @@ export default class Pagination{
             this.startShort = false;
             this.indexFirst = true;
             this.shortPagination(2);
-            this.printPage(firstButton.textContent)
-            this.taskController.modal();
+            this.printPage(firstButton.textContent);
+            Modal.initModal();
+            this.taskController.checkTask();
 
             this.indexFirst = false;
         });
@@ -319,7 +320,8 @@ export default class Pagination{
             console.log("en cFLbuttons: ", container.childNodes.length)
             this.shortPagination(container.childNodes.length);
             this.printPage(lastButton.textContent);
-            this.taskController.modal();
+            Modal.initModal();
+            this.taskController.checkTask();
 
             this.indexLast = false;
         });
